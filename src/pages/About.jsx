@@ -1,2 +1,0 @@
-const About = () => <div className='p-8'><h2 className='text-2xl font-bold mb-4'>About Us</h2><p>We are Novus Exchange — delivering bold, investigative insights that challenge the mainstream narrative. No fluff, just clarity.</p></div>;
-export default About;

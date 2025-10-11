@@ -1,2 +1,0 @@
-const Social = () => <div className='p-8'><h2 className='text-2xl font-bold mb-4'>Social Responsibility</h2><p>From ethics to activism, we highlight those who walk the talk — and call out those who don't.</p></div>;
-export default Social;

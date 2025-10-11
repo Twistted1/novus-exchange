@@ -1,2 +1,0 @@
-const Political = () => <div className='p-8'><h2 className='text-2xl font-bold mb-4'>Political Insights</h2><p>Our political commentary cuts through bias, exposing what's real in policy, power, and propaganda.</p></div>;
-export default Political;
