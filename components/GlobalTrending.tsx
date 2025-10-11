@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { GoogleGenAI, Type } from '@google/genai';
+import { Type } from '@google/genai';
 import GlassCard from './GlassCard';
 import { Trend } from '../types';
+import { renderMarkdown } from '../utils';
+
 
 interface GlobalTrendingProps {
-  ai: GoogleGenAI | null;
 }
 
 // Define the expected JSON schema for the AI response to improve readability.
@@ -68,7 +69,7 @@ const ArticleSkeletonLoader: React.FC = () => (
     </div>
 );
 
-const GlobalTrending: React.FC<GlobalTrendingProps> = ({ ai }) => {
+const GlobalTrending: React.FC<GlobalTrendingProps> = () => {
   const [trends, setTrends] = useState<Trend[] | null>(null);
   const [isListLoading, setIsListLoading] = useState<boolean>(true);
   const [listError, setListError] = useState<string | null>(null);
@@ -99,28 +100,33 @@ const GlobalTrending: React.FC<GlobalTrendingProps> = ({ ai }) => {
         }
       } catch (e) { console.error("Error reading from cache", e); }
 
-      if (!ai) {
-        setListError("AI service is not initialized.");
-        setIsListLoading(false);
-        return;
-      }
-
       try {
         const prompt = `Act as a geopolitical and economic analyst. Identify the three most pressing global trending topics right now. For each topic, provide a concise, one-paragraph summary explaining its significance. Focus on topics related to international relations, supply chains, economic shifts, or major policy changes.`;
         
-        const result = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents: prompt,
-          config: {
-            responseMimeType: "application/json",
-            responseSchema: trendsSchema,
-          }
+        const response = await fetch('/api/gemini', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'gemini-2.5-flash',
+                contents: prompt,
+                config: {
+                    responseMimeType: "application/json",
+                    responseSchema: trendsSchema,
+                }
+            })
         });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to fetch trends');
+        }
+
+        const result = await response.json();
         
         const parsedResult = JSON.parse(result.text);
-        if (parsedResult.trends && parsedResult.trends.length === 3) {
-            setTrends(parsedResult.trends);
-            localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data: parsedResult.trends }));
+        if (parsedResult.trends && parsedResult.trends.length > 0) {
+            setTrends(parsedResult.trends.slice(0,3));
+            localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data: parsedResult.trends.slice(0,3) }));
         } else {
             throw new Error("Invalid response format from AI.");
         }
@@ -133,12 +139,12 @@ const GlobalTrending: React.FC<GlobalTrendingProps> = ({ ai }) => {
     };
 
     fetchTrends();
-  }, [ai]);
+  }, []);
 
   // Effect to fetch the full article when a trend is selected
   useEffect(() => {
     const fetchTrendingArticle = async () => {
-        if (!selectedTrend || !ai) return;
+        if (!selectedTrend) return;
 
         setIsArticleLoading(true);
         setTrendingArticle(null);
@@ -156,10 +162,21 @@ const GlobalTrending: React.FC<GlobalTrendingProps> = ({ ai }) => {
             
             SUMMARY: "${selectedTrend.summary}"`;
 
-            const result = await ai.models.generateContent({
-                model: 'gemini-2.5-flash',
-                contents: prompt,
+            const response = await fetch('/api/gemini', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: 'gemini-2.5-flash',
+                    contents: prompt,
+                })
             });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to generate article');
+            }
+
+            const result = await response.json();
             setTrendingArticle(result.text.trim());
         } catch (error) {
             console.error("Failed to generate trending article:", error);
@@ -170,7 +187,7 @@ const GlobalTrending: React.FC<GlobalTrendingProps> = ({ ai }) => {
     };
 
     fetchTrendingArticle();
-  }, [selectedTrend, ai]);
+  }, [selectedTrend]);
 
   const handleSelectTrend = (trend: Trend) => {
     setSelectedTrend(trend);
@@ -184,12 +201,7 @@ const GlobalTrending: React.FC<GlobalTrendingProps> = ({ ai }) => {
   
   const renderArticleContent = () => {
     if (!trendingArticle) return null;
-    const paragraphs = trendingArticle.split('\n').filter(p => p.trim() !== '');
-    return paragraphs.map((paragraph, index) => (
-      <p key={index} className="mb-6 leading-relaxed">
-        {paragraph}
-      </p>
-    ));
+    return renderMarkdown(trendingArticle);
   };
 
 

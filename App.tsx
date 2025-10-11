@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { GoogleGenAI } from '@google/genai';
 import { Page, Article, Author, NovusMessage, Trend } from './types';
 import { articles as allArticles } from './data/content';
 import { fileToGenerativePart } from './utils';
@@ -26,7 +25,6 @@ const App: React.FC = () => {
     const [messages, setMessages] = useState<NovusMessage[]>([
         { id: 0, source: 'model', text: "Hello! I'm Novus, your AI research assistant. Ask me anything about our articles, global trends, or other complex topics." }
     ]);
-    const [ai, setAi] = useState<GoogleGenAI | null>(null);
 
     // Refs for scroll animations
     const aboutRef = useRef<HTMLElement>(null);
@@ -34,20 +32,6 @@ const App: React.FC = () => {
     const trendingRef = useRef<HTMLElement>(null);
     const askNovusRef = useRef<HTMLElement>(null);
     const contactRef = useRef<HTMLElement>(null);
-
-    // Initialize the Google AI client
-    useEffect(() => {
-        if (process.env.API_KEY) {
-            try {
-                const genAI = new GoogleGenAI({ apiKey: process.env.API_KEY });
-                setAi(genAI);
-            } catch (error) {
-                console.error("Failed to initialize GoogleGenAI:", error);
-            }
-        } else {
-            console.warn("API_KEY environment variable not set.");
-        }
-    }, []);
 
     // Intersection Observer for scroll animations
     useEffect(() => {
@@ -141,12 +125,6 @@ const App: React.FC = () => {
     };
 
     const handleChatbotSendMessage = async (message: string) => {
-        if (!ai) {
-            console.error("AI client not initialized.");
-            setMessages(prev => [...prev, { id: Date.now(), source: 'model', text: 'Sorry, the AI service is not available right now.' }]);
-            return;
-        }
-
         const userMessage: NovusMessage = {
             id: Date.now(),
             source: 'user',
@@ -162,13 +140,24 @@ const App: React.FC = () => {
     
             const fullPrompt = `Based on the context of the Novus Exchange website and its articles, answer the user's question.\n\nCONTEXT:\n${articlesContext}\n\nUSER QUESTION: "${message}"`;
 
-            const result = await ai.models.generateContent({
-                model: 'gemini-2.5-flash',
-                contents: fullPrompt,
-                config: {
-                    systemInstruction: "You are Novus, a specialized AI assistant for the 'Novus Exchange' website. Your sole purpose is to answer user questions about the website, its articles, its mission, and its author. You must be an expert on the provided article summaries. You cannot create images or answer questions outside of this context. If asked something unrelated, politely state that you can only answer questions about Novus Exchange.",
-                }
+            const response = await fetch('/api/gemini', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: 'gemini-2.5-flash',
+                    contents: fullPrompt,
+                    config: {
+                        systemInstruction: "You are Novus, a specialized AI assistant for the 'Novus Exchange' website. Your sole purpose is to answer user questions about the website, its articles, its mission, and its author. You must be an expert on the provided article summaries. You cannot create images or answer questions outside of this context. If asked something unrelated, politely state that you can only answer questions about Novus Exchange.",
+                    }
+                })
             });
+            
+            if (!response.ok) {
+                 const errorData = await response.json();
+                 throw new Error(errorData.error || 'Failed to get response from AI');
+            }
+
+            const result = await response.json();
             
             const modelResponse: NovusMessage = {
                 id: Date.now() + 2,
@@ -224,7 +213,7 @@ const App: React.FC = () => {
                 </section>
 
                 <section id={Page.GlobalTrending} ref={trendingRef} className={`${sectionClasses} fade-in-parent-only`}>
-                    <div className={contentWrapperClasses}><GlobalTrending ai={ai} /></div>
+                    <div className={contentWrapperClasses}><GlobalTrending /></div>
                 </section>
 
                 <section id={Page.AskNovusAI} ref={askNovusRef} className={`${sectionClasses} fade-in-section`}>
@@ -235,7 +224,7 @@ const App: React.FC = () => {
                                 Your intelligent research partner. Analyze topics, generate images, and get answers with voice or text.
                             </p>
                         </div>
-                        <AskNovus ai={ai} onSearch={setSearchQuery} />
+                        <AskNovus onSearch={setSearchQuery} />
                     </div>
                 </section>
 

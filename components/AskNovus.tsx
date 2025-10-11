@@ -1,15 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { GoogleGenAI } from '@google/genai';
 import { NovusMessage } from '../types';
 import { fileToGenerativePart, renderMarkdown } from '../utils';
 import GlassCard from './GlassCard';
 
 interface AskNovusProps {
-  ai: GoogleGenAI | null;
   onSearch: (query: string) => void;
 }
 
-const AskNovus: React.FC<AskNovusProps> = ({ ai, onSearch }) => {
+const AskNovus: React.FC<AskNovusProps> = ({ onSearch }) => {
   const [messages, setMessages] = useState<NovusMessage[]>([
     { id: 0, source: 'model', text: "Hello! I'm Novus. How can I assist your research today? You can ask me to analyze topics, create images, or answer questions." }
   ]);
@@ -76,7 +74,7 @@ const AskNovus: React.FC<AskNovusProps> = ({ ai, onSearch }) => {
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    if ((!userInput.trim() && !selectedImage) || !ai) return;
+    if (!userInput.trim() && !selectedImage) return;
 
     setIsLoading(true);
     const userMessage: NovusMessage = {
@@ -85,56 +83,70 @@ const AskNovus: React.FC<AskNovusProps> = ({ ai, onSearch }) => {
         text: userInput,
         imageUrl: previewUrl ?? undefined,
     };
+    
+    // Use a function for setting messages to get the latest state
     setMessages(prev => [...prev, userMessage]);
+    
+    // Clear inputs immediately
+    const currentUserInput = userInput;
     setUserInput('');
     setSelectedImage(null);
+    setPreviewUrl(null);
 
     const loadingMessage: NovusMessage = { id: Date.now() + 1, source: 'model', isLoading: true };
     setMessages(prev => [...prev, loadingMessage]);
 
     try {
         let modelResponse: NovusMessage;
-        const isImageGenerationRequest = userInput.toLowerCase().match(/^(generate|create|draw|make an image of)/) && !selectedImage;
+        const isImageGenerationRequest = currentUserInput.toLowerCase().match(/^(generate|create|draw|make an image of)/) && !selectedImage;
         
         if (isImageGenerationRequest) {
-            const response = await ai.models.generateImages({
-                model: 'imagen-4.0-generate-001',
-                prompt: userInput,
-                config: { numberOfImages: 1, outputMimeType: 'image/jpeg' },
-            });
-            const base64ImageBytes = response.generatedImages[0].image.imageBytes;
-            const imageUrl = `data:image/jpeg;base64,${base64ImageBytes}`;
+            // Gracefully handle image generation requests as they cannot be supported securely
             modelResponse = {
                 id: Date.now() + 2,
                 source: 'model',
-                text: `Here is the image you requested for: "${userInput}"`,
-                imageUrl: imageUrl,
+                text: "Sorry, image generation is currently unavailable. This feature is being reworked for better security and performance. Please try asking a question or analyzing an image instead.",
             };
+            setMessages(prev => [...prev.slice(0, -1), modelResponse]);
         } else {
             const parts = [];
             if (selectedImage) {
                 const imagePart = await fileToGenerativePart(selectedImage);
                 parts.push(imagePart);
             }
-            if (userInput.trim()) {
-                parts.push({ text: userInput });
+            if (currentUserInput.trim()) {
+                parts.push({ text: currentUserInput });
             }
-            const result = await ai.models.generateContent({
+
+            const response = await fetch('/api/gemini', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
                 model: 'gemini-2.5-flash',
                 contents: { parts },
+              })
             });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to get response from AI');
+            }
+            
+            const result = await response.json();
             modelResponse = {
                 id: Date.now() + 2,
                 source: 'model',
                 text: result.text,
             };
+            setMessages(prev => [...prev.slice(0, -1), modelResponse]);
         }
-        setMessages(prev => [...prev.slice(0, -1), modelResponse]);
-
+        
     } catch (err) {
         console.error("AI content generation error:", err);
         setError('Our AI is currently experiencing high demand. Please try again later. In the meantime, you can search our articles.');
-        setMessages(prev => prev.slice(0, -2)); // Remove user message and loading indicator
+        const finalUserMessage = userMessage; // Capture userMessage in a new const
+        const finalLoadingMessage = loadingMessage; // Capture loadingMessage
+        setMessages(prev => prev.filter(m => m.id !== finalUserMessage.id && m.id !== finalLoadingMessage.id)); // Remove user message and loading indicator on error
     } finally {
         setIsLoading(false);
     }
@@ -214,7 +226,7 @@ const AskNovus: React.FC<AskNovusProps> = ({ ai, onSearch }) => {
             {previewUrl && (
                 <div className="relative mb-2 w-20 h-20">
                     <img src={previewUrl} alt="Preview" className="w-full h-full object-cover rounded-md" />
-                    <button onClick={() => setSelectedImage(null)} className="absolute -top-2 -right-2 bg-black/70 rounded-full p-0.5 text-white">
+                    <button onClick={() => { setSelectedImage(null); setPreviewUrl(null); }} className="absolute -top-2 -right-2 bg-black/70 rounded-full p-0.5 text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                 </div>
