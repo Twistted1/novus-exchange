@@ -14,7 +14,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Missing model or contents in request body' });
     }
 
-    const apiKey = process.env.API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
     if (!apiKey) {
         console.error('API_KEY is not set in environment variables.');
         return res.status(500).json({ error: 'API key not configured on the server.' });
