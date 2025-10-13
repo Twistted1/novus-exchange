@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { NovusMessage } from '../types';
 import { fileToGenerativePart, renderMarkdown } from '../utils';
 import GlassCard from './GlassCard';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 interface AskNovusProps {
   onSearch: (query: string) => void;
@@ -9,7 +10,12 @@ interface AskNovusProps {
 
 const AskNovus: React.FC<AskNovusProps> = ({ onSearch }) => {
   const [messages, setMessages] = useState<NovusMessage[]>([
-    { id: 0, source: 'model', text: "Hello! I'm Novus. How can I assist your research today? You can ask me to analyze topics, create images, or answer questions." }
+    {
+      id: 0,
+      source: 'model',
+      text:
+        "Hello! I'm Novus. How can I assist your research today? You can ask me to analyze topics, create images, or answer questions."
+    }
   ]);
   const [userInput, setUserInput] = useState('');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -18,10 +24,18 @@ const AskNovus: React.FC<AskNovusProps> = ({ onSearch }) => {
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [localSearchQuery, setLocalSearchQuery] = useState('');
-  
+
   const chatBodyRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const recognitionRef = useRef<any>(null);
+
+  // ---------- GEMINI SDK SETUP (client-side) ----------
+  // IMPORTANT: In Vercel (Production), set:
+  // VITE_GEMINI_API_KEY = <your key>
+  const GEMINI_KEY = (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
+  const genAI = new GoogleGenerativeAI(GEMINI_KEY);
+  // Use your preferred model here
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   // Scroll to bottom of chat on new message
   useEffect(() => {
@@ -44,31 +58,31 @@ const AskNovus: React.FC<AskNovusProps> = ({ onSearch }) => {
   // Setup Speech Recognition
   useEffect(() => {
     if (typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
-        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-        const recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.lang = 'en-US';
-        recognition.interimResults = false;
-        
-        recognition.onstart = () => setIsListening(true);
-        recognition.onend = () => setIsListening(false);
-        recognition.onerror = (event: any) => {
-            console.error('Speech recognition error:', event.error);
-            setIsListening(false);
-        };
-        recognition.onresult = (event: any) => {
-            const transcript = event.results[0][0].transcript;
-            setUserInput(transcript);
-        };
-        recognitionRef.current = recognition;
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+
+      recognition.onstart = () => setIsListening(true);
+      recognition.onend = () => setIsListening(false);
+      recognition.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+      };
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setUserInput(transcript);
+      };
+      recognitionRef.current = recognition;
     }
   }, []);
 
   const handleMicClick = () => {
     if (isListening) {
-        recognitionRef.current?.stop();
+      recognitionRef.current?.stop();
     } else {
-        recognitionRef.current?.start();
+      recognitionRef.current?.start();
     }
   };
 
@@ -76,17 +90,22 @@ const AskNovus: React.FC<AskNovusProps> = ({ onSearch }) => {
     e?.preventDefault();
     if (!userInput.trim() && !selectedImage) return;
 
+    if (!GEMINI_KEY) {
+      setError('Missing VITE_GEMINI_API_KEY in environment. Please configure it in Vercel → Settings → Environment Variables.');
+      return;
+    }
+
     setIsLoading(true);
     const userMessage: NovusMessage = {
-        id: Date.now(),
-        source: 'user',
-        text: userInput,
-        imageUrl: previewUrl ?? undefined,
+      id: Date.now(),
+      source: 'user',
+      text: userInput,
+      imageUrl: previewUrl ?? undefined
     };
-    
+
     // Use a function for setting messages to get the latest state
     setMessages(prev => [...prev, userMessage]);
-    
+
     // Clear inputs immediately
     const currentUserInput = userInput;
     setUserInput('');
@@ -97,61 +116,66 @@ const AskNovus: React.FC<AskNovusProps> = ({ onSearch }) => {
     setMessages(prev => [...prev, loadingMessage]);
 
     try {
-        let modelResponse: NovusMessage;
-        const isImageGenerationRequest = currentUserInput.toLowerCase().match(/^(generate|create|draw|make an image of)/) && !selectedImage;
-        
-        if (isImageGenerationRequest) {
-            // Gracefully handle image generation requests as they cannot be supported securely
-            modelResponse = {
-                id: Date.now() + 2,
-                source: 'model',
-                text: "Sorry, image generation is currently unavailable. This feature is being reworked for better security and performance. Please try asking a question or analyzing an image instead.",
-            };
-            setMessages(prev => [...prev.slice(0, -1), modelResponse]);
-        } else {
-            const parts = [];
-            if (selectedImage) {
-                const imagePart = await fileToGenerativePart(selectedImage);
-                parts.push(imagePart);
-            }
-            if (currentUserInput.trim()) {
-                parts.push({ text: currentUserInput });
-            }
+      let modelResponse: NovusMessage;
+      const isImageGenerationRequest =
+        currentUserInput.toLowerCase().match(/^(generate|create|draw|make an image of)/) && !selectedImage;
 
-            const response = await fetch('/api/gemini', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                model: 'gemini-2.5-flash',
-                contents: { parts },
-              })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to get response from AI');
-            }
-            
-            const result = await response.json();
-            modelResponse = {
-                id: Date.now() + 2,
-                source: 'model',
-                text: result.text,
-            };
-            setMessages(prev => [...prev.slice(0, -1), modelResponse]);
+      if (isImageGenerationRequest) {
+        // Gracefully handle image generation requests as they cannot be supported securely (client-side key)
+        modelResponse = {
+          id: Date.now() + 2,
+          source: 'model',
+          text:
+            'Sorry, image generation is currently unavailable. This feature is being reworked for better security and performance. Please try asking a question or analyzing an image instead.'
+        };
+        setMessages(prev => [...prev.slice(0, -1), modelResponse]);
+      } else {
+        // Build parts for Gemini (text + optional image)
+        const parts: any[] = [];
+        if (selectedImage) {
+          const imagePart = await fileToGenerativePart(selectedImage);
+          parts.push(imagePart);
         }
-        
+        if (currentUserInput.trim()) {
+          parts.push({ text: currentUserInput });
+        }
+
+        // ---------- DIRECT SDK CALL ----------
+        const sdkResult = await model.generateContent({
+  contents: [
+    {
+      role: "user",
+      parts: parts as any[], // your built array (text + optional imagePart)
+    },
+  ],
+});
+const aiText =
+  (typeof (sdkResult.response as any).text === "function"
+    ? (sdkResult.response as any).text()
+    : sdkResult?.response?.candidates?.[0]?.content?.parts?.[0]?.text) || "";
+
+        modelResponse = {
+          id: Date.now() + 2,
+          source: 'model',
+          text: aiText
+        };
+        setMessages(prev => [...prev.slice(0, -1), modelResponse]);
+      }
     } catch (err) {
-        console.error("AI content generation error:", err);
-        setError('Our AI is currently experiencing high demand. Please try again later. In the meantime, you can search our articles.');
-        const finalUserMessage = userMessage; // Capture userMessage in a new const
-        const finalLoadingMessage = loadingMessage; // Capture loadingMessage
-        setMessages(prev => prev.filter(m => m.id !== finalUserMessage.id && m.id !== finalLoadingMessage.id)); // Remove user message and loading indicator on error
+      console.error('AI content generation error:', err);
+      setError(
+        'Our AI is currently experiencing high demand. Please try again later. In the meantime, you can search our articles.'
+      );
+      const finalUserMessage = userMessage; // Capture userMessage in a new const
+      const finalLoadingMessage = loadingMessage; // Capture loadingMessage
+      setMessages(prev =>
+        prev.filter(m => m.id !== finalUserMessage.id && m.id !== finalLoadingMessage.id)
+      ); // Remove user + loading on error
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
-  
+
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedImage(e.target.files[0]);
@@ -167,8 +191,19 @@ const AskNovus: React.FC<AskNovusProps> = ({ onSearch }) => {
     return (
       <GlassCard className="max-w-4xl mx-auto flex flex-col items-center justify-center h-[70vh] text-center p-8">
         <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center shrink-0 border border-red-500/50 mb-4">
-          <svg className="w-8 h-8 text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+          <svg
+            className="w-8 h-8 text-red-400"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+            />
           </svg>
         </div>
         <h3 className="text-xl font-semibold text-white">AI Assistant Unavailable</h3>
@@ -178,7 +213,7 @@ const AskNovus: React.FC<AskNovusProps> = ({ onSearch }) => {
             <input
               type="text"
               value={localSearchQuery}
-              onChange={(e) => setLocalSearchQuery(e.target.value)}
+              onChange={e => setLocalSearchQuery(e.target.value)}
               placeholder="Search articles..."
               className="w-full bg-white/10 border-white/20 rounded-md py-2.5 pl-4 pr-24 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
             />
@@ -196,67 +231,132 @@ const AskNovus: React.FC<AskNovusProps> = ({ onSearch }) => {
 
   return (
     <GlassCard className="max-w-4xl mx-auto flex flex-col h-[70vh] p-0 overflow-hidden">
-        <div ref={chatBodyRef} className="flex-grow p-4 sm:p-6 overflow-y-auto space-y-6">
-            {messages.map((msg) => (
-                <div key={msg.id} className={`flex items-start gap-3.5 ${msg.source === 'user' ? 'justify-end' : ''}`}>
-                    {msg.source === 'model' && (
-                        <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center shrink-0 border border-cyan-500/50">
-                           <svg className="w-5 h-5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
-                        </div>
-                    )}
-                    <div className={`p-3 rounded-xl max-w-lg ${msg.source === 'user' ? 'bg-purple-500/30' : 'bg-black/20'}`}>
-                        {msg.isLoading ? (
-                            <div className="flex items-center space-x-1">
-                                <span className="w-2 h-2 bg-white/50 rounded-full animate-pulse [animation-delay:-0.3s]"></span>
-                                <span className="w-2 h-2 bg-white/50 rounded-full animate-pulse [animation-delay:-0.15s]"></span>
-                                <span className="w-2 h-2 bg-white/50 rounded-full animate-pulse"></span>
-                            </div>
-                        ) : (
-                            <>
-                                {msg.imageUrl && <img src={msg.imageUrl} alt="Content" className="rounded-lg mb-2 max-w-full h-auto" />}
-                                <div className="text-sm text-white prose prose-invert max-w-none prose-p:mb-2">{renderMarkdown(msg.text)}</div>
-                            </>
-                        )}
-                    </div>
-                </div>
-            ))}
-        </div>
-        
-        <div className="p-4 border-t border-white/10">
-            {previewUrl && (
-                <div className="relative mb-2 w-20 h-20">
-                    <img src={previewUrl} alt="Preview" className="w-full h-full object-cover rounded-md" />
-                    <button onClick={() => { setSelectedImage(null); setPreviewUrl(null); }} className="absolute -top-2 -right-2 bg-black/70 rounded-full p-0.5 text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
-                </div>
+      <div ref={chatBodyRef} className="flex-grow p-4 sm:p-6 overflow-y-auto space-y-6">
+        {messages.map(msg => (
+          <div
+            key={msg.id}
+            className={`flex items-start gap-3.5 ${msg.source === 'user' ? 'justify-end' : ''}`}
+          >
+            {msg.source === 'model' && (
+              <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center shrink-0 border border-cyan-500/50">
+                <svg
+                  className="w-5 h-5 text-cyan-400"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+              </div>
             )}
-            <form onSubmit={handleSendMessage} className="flex items-center bg-white/10 rounded-lg p-2 gap-2">
-                <input type="file" ref={fileInputRef} onChange={handleImageSelect} className="hidden" accept="image/*" />
-                <button type="button" onClick={() => fileInputRef.current?.click()} className="p-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-md transition-colors disabled:text-gray-600 disabled:bg-transparent" disabled={isLoading} aria-label="Upload image">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                </button>
-                <button type="button" onClick={handleMicClick} className={`p-2 rounded-md transition-colors disabled:text-gray-600 disabled:bg-transparent ${isListening ? 'text-red-500' : 'text-gray-300 hover:text-white hover:bg-white/10'}`} disabled={isLoading} aria-label="Use voice command">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
-                </button>
-                <textarea
-                    value={userInput}
-                    onChange={(e) => setUserInput(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
-                    placeholder="Ask anything or describe an image to create..."
-                    className="flex-grow bg-transparent py-2 px-3 text-white focus:outline-none resize-none h-10 max-h-24"
-                    rows={1}
-                    disabled={isLoading}
-                />
-                <button type="submit" className="p-2 text-white bg-red-600 hover:bg-red-700 rounded-md shadow-lg hover:shadow-red-500/30 transition-all duration-300 hover:-translate-y-1 disabled:opacity-50 disabled:transform-none disabled:shadow-none" disabled={isLoading || (!userInput.trim() && !selectedImage)}>
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
-                </button>
-            </form>
-            <div className="text-center mt-2">
-                <p className="text-xs text-gray-500">Your privacy is important. We do not keep records of your conversations.</p>
-                <p className="text-xs text-gray-500 mt-1">AI may be incorrect.</p>
+            <div
+              className={`p-3 rounded-xl max-w-lg ${msg.source === 'user' ? 'bg-purple-500/30' : 'bg-black/20'}`}
+            >
+              {msg.isLoading ? (
+                <div className="flex items-center space-x-1">
+                  <span className="w-2 h-2 bg-white/50 rounded-full animate-pulse [animation-delay:-0.3s]"></span>
+                  <span className="w-2 h-2 bg-white/50 rounded-full animate-pulse [animation-delay:-0.15s]"></span>
+                  <span className="w-2 h-2 bg-white/50 rounded-full animate-pulse"></span>
+                </div>
+              ) : (
+                <>
+                  {msg.imageUrl && (
+                    <img src={msg.imageUrl} alt="Content" className="rounded-lg mb-2 max-w-full h-auto" />
+                  )}
+                  <div className="text-sm text-white prose prose-invert max-w-none prose-p:mb-2">
+                    {renderMarkdown(msg.text)}
+                  </div>
+                </>
+              )}
             </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="p-4 border-t border-white/10">
+        {previewUrl && (
+          <div className="relative mb-2 w-20 h-20">
+            <img src={previewUrl} alt="Preview" className="w-full h-full object-cover rounded-md" />
+            <button
+              onClick={() => {
+                setSelectedImage(null);
+                setPreviewUrl(null);
+              }}
+              className="absolute -top-2 -right-2 bg-black/70 rounded-full p-0.5 text-white"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        )}
+        <form onSubmit={handleSendMessage} className="flex items-center bg-white/10 rounded-lg p-2 gap-2">
+          <input type="file" ref={fileInputRef} onChange={handleImageSelect} className="hidden" accept="image/*" />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="p-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-md transition-colors disabled:text-gray-600 disabled:bg-transparent"
+            disabled={isLoading}
+            aria-label="Upload image"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={handleMicClick}
+            className={`p-2 rounded-md transition-colors disabled:text-gray-600 disabled:bg-transparent ${
+              isListening ? 'text-red-500' : 'text-gray-300 hover:text-white hover:bg-white/10'
+            }`}
+            disabled={isLoading}
+            aria-label="Use voice command"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round"
+                d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+          </button>
+          <textarea
+            value={userInput}
+            onChange={e => setUserInput(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
+            placeholder="Ask anything or describe an image to create..."
+            className="flex-grow bg-transparent py-2 px-3 text-white focus:outline-none resize-none h-10 max-h-24"
+            rows={1}
+            disabled={isLoading}
+          />
+          <button
+            type="submit"
+            className="p-2 text-white bg-red-600 hover:bg-red-700 rounded-md shadow-lg hover:shadow-red-500/30 transition-all duration-300 hover:-translate-y-1 disabled:opacity-50 disabled:transform-none disabled:shadow-none"
+            disabled={isLoading || (!userInput.trim() && !selectedImage)}
+          >
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z">
+              </path>
+            </svg>
+          </button>
+        </form>
+        <div className="text-center mt-2">
+          <p className="text-xs text-gray-500">Your privacy is important. We do not keep records of your conversations.</p>
+          <p className="text-xs text-gray-500 mt-1">AI may be incorrect.</p>
         </div>
+      </div>
     </GlassCard>
   );
 };
