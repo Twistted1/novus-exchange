@@ -33,6 +33,7 @@ const AskNovus: React.FC<AskNovusProps> = ({ onSearch }) => {
   // IMPORTANT: In Vercel (Production), set:
   // VITE_GEMINI_API_KEY = <your key>
   const GEMINI_KEY = (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
+  console.log('NOVUS_HAS_VITE_KEY', Boolean(GEMINI_KEY));
   const genAI = new GoogleGenerativeAI(GEMINI_KEY);
   // Use your preferred model here
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
