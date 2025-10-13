@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Page, Article, Author, NovusMessage, Trend } from './types';
 import { articles as allArticles } from './data/content';
 import { fileToGenerativePart } from './utils';
+import { GoogleGenAI } from '@google/genai';
 
 import Layout from './components/layout/Layout';
 import Hero from './components/Hero';
@@ -134,44 +135,36 @@ const App: React.FC = () => {
         setMessages(prev => [...prev, userMessage, loadingMessage]);
 
         try {
+            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
             const articlesContext = allArticles.map(article =>
                 `Title: ${article.title}\nExcerpt: ${article.excerpt}`
             ).join('\n\n');
     
             const fullPrompt = `Based on the context of the Novus Exchange website and its articles, answer the user's question.\n\nCONTEXT:\n${articlesContext}\n\nUSER QUESTION: "${message}"`;
 
-            const response = await fetch('/api/gemini', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: 'gemini-2.5-flash',
-                    contents: fullPrompt,
-                    config: {
-                        systemInstruction: "You are Novus, a specialized AI assistant for the 'Novus Exchange' website. Your sole purpose is to answer user questions about the website, its articles, its mission, and its author. You must be an expert on the provided article summaries. You cannot create images or answer questions outside of this context. If asked something unrelated, politely state that you can only answer questions about Novus Exchange.",
-                    }
-                })
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: fullPrompt,
+                config: {
+                    systemInstruction: "You are Novus, a specialized AI assistant for the 'Novus Exchange' website. Your sole purpose is to answer user questions about the website, its articles, its mission, and its author. You must be an expert on the provided article summaries. You cannot create images or answer questions outside of this context. If asked something unrelated, politely state that you can only answer questions about Novus Exchange.",
+                }
             });
-            
-            if (!response.ok) {
-                 const errorData = await response.json();
-                 throw new Error(errorData.error || 'Failed to get response from AI');
-            }
-
-            const result = await response.json();
             
             const modelResponse: NovusMessage = {
                 id: Date.now() + 2,
                 source: 'model',
-                text: result.text,
+                text: response.text,
             };
             setMessages(prev => [...prev.slice(0, -1), modelResponse]);
 
-        } catch (error) {
+        } catch (error: any) {
             console.error("AI content generation error:", error);
+            const errorMessageText = `I'm sorry, an error occurred: ${error.message || 'The AI assistant is temporarily unavailable.'}`;
+            
             const errorMessage: NovusMessage = {
                 id: Date.now() + 2,
                 source: 'model',
-                text: 'Our AI assistant is temporarily unavailable due to high demand. Please try again later. In the meantime, feel free to use the search bar at the top to find relevant articles.',
+                text: errorMessageText,
             };
             setMessages(prev => [...prev.slice(0, -1), errorMessage]);
         }
