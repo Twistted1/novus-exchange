@@ -2,15 +2,39 @@ import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 
 export default function AskNovus() {
-  const [messages, setMessages] = useState([{ id: '1', sender: 'ai', text: 'Ask a question, or type "image: ..." / "generate an image of ...".' }])
+  const [messages, setMessages] = useState([{ id: '1', sender: 'ai', text: 'Hello' }])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [isListening, setIsListening] = useState(false)
+  const fileInputRef = useRef(null)
   const chatEndRef = useRef(null)
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  const startListening = () => {
+    if (typeof window === 'undefined') return
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+      const recognition = new SpeechRecognition()
+      recognition.lang = 'en-US'
+      recognition.interimResults = false
+      recognition.maxAlternatives = 1
+      setIsListening(true)
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript
+        setInput(prev => prev + (prev ? ' ' : '') + transcript)
+        setIsListening(false)
+      }
+      recognition.onerror = () => { setIsListening(false) }
+      recognition.onend = () => { setIsListening(false) }
+      recognition.start()
+    } else {
+      alert('Voice input is not supported in this browser.')
+    }
+  }
 
   const callApi = async (payload) => {
     setIsLoading(true)
@@ -54,21 +78,45 @@ export default function AskNovus() {
     }
   }
 
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file || isLoading) return
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = async () => {
+      const base64Image = String(reader.result).split(',')[1]
+      const mimeType = file.type
+      const userMessage = { id: Date.now().toString(), sender: 'user', text: `Analyzing image: ${file.name}`, imageUrl: URL.createObjectURL(file), type: 'image_upload' }
+      setMessages(prev => [...prev, userMessage])
+      const result = await callApi({ prompt: 'Analyze this image and provide a detailed description.', imageData: base64Image, mimeType })
+      if (result) {
+        const aiMsg = { id: Date.now().toString(), sender: 'ai', text: result.text, type: 'text' }
+        setMessages(prev => [...prev, aiMsg])
+      }
+    }
+    reader.onerror = () => { setError('Failed to read the image file.') }
+  }
+
   return (
     <section id="ask-novus" className="bg-black reveal">
       <div className="container mx-auto px-6 max-w-4xl">
         <h2 className="text-4xl font-bold mb-4 text-center text-white">Ask Novus</h2>
         <p className="text-gray-400 mb-8 text-center max-w-xl mx-auto">AI-powered research assistant.</p>
 
-        <div className="bg-[#111] border border-white/10 rounded-xl h-[60vh] flex flex-col overflow-hidden shadow-2xl relative">
+        <div className="bg-[#111] border border-white/10 rounded-xl h-[500px] flex flex-col overflow-hidden shadow-2xl relative">
           <div className="flex-grow p-6 overflow-y-auto space-y-4">
             {messages.map((msg, index) => (
               <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[85%] p-4 rounded-lg text-sm leading-relaxed ${msg.sender === 'user'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-cyan-600 text-white'
                   : 'bg-[#222] text-gray-200 border border-white/5'
                   }`}>
                   {msg.type === 'error' ? <span className="text-red-400">{msg.text}</span> : <p>{msg.text}</p>}
+                  {msg.type === 'image_upload' && (
+                    <div className="mt-3">
+                      <Image src={msg.imageUrl} alt="Uploaded" width={200} height={200} className="rounded-lg border border-white/10 w-full h-auto" unoptimized />
+                    </div>
+                  )}
                   {msg.type === 'image' && (
                     <div className="mt-3">
                       <Image src={msg.imageUrl} alt="Generated" width={512} height={512} className="rounded-lg border border-white/10" unoptimized />
@@ -87,18 +135,25 @@ export default function AskNovus() {
           </div>
 
           <form onSubmit={handleSubmit} className="p-4 bg-[#111] border-t border-white/10">
-            <div className="flex gap-3">
+            <div className="flex gap-3 items-center">
+              <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" disabled={isLoading} />
+              <button type="button" onClick={() => fileInputRef.current && fileInputRef.current.click()} disabled={isLoading} className="text-gray-400 hover:text-cyan-400 transition-colors p-2" aria-label="Upload Image">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              </button>
+              <button type="button" onClick={startListening} disabled={isLoading} className={`text-gray-400 hover:text-cyan-400 transition-colors p-2 ${isListening ? 'text-red-500 animate-pulse' : ''}`} aria-label="Voice Input">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
+              </button>
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={isLoading ? 'Thinking...' : "Ask a question..."}
-                className="flex-grow bg-[#222] text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 border border-white/5 placeholder-gray-600"
+                className="flex-grow bg-[#222] text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-500 border border-white/5 placeholder-gray-600"
                 disabled={isLoading}
               />
               <button
                 type="submit"
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors"
+                className="bg-cyan-600 text-white px-6 py-3 rounded-lg hover:bg-cyan-700 disabled:opacity-50 font-medium transition-colors"
                 disabled={isLoading || !input.trim()}
               >
                 Send
