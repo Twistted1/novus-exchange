@@ -98,32 +98,32 @@ export default function AskNovus() {
   }
 
   return (
-    <section id="ask-novus" className="bg-black reveal">
+    <section id="ask-novus" className="bg-transparent reveal">
       <div className="container mx-auto px-6 max-w-4xl">
-        <h2 className="text-4xl font-bold mb-4 text-center text-white">Ask Novus</h2>
-        <p className="text-gray-400 mb-8 text-center max-w-xl mx-auto">AI-powered research assistant.</p>
+        <h2 className="text-4xl font-bold mb-4 text-center text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">Ask Novus</h2>
+        <p className="text-gray-300 mb-8 text-center max-w-xl mx-auto font-light">AI-powered research assistant.</p>
 
-        <div className="bg-[#111] border border-white/10 rounded-xl h-[500px] flex flex-col overflow-hidden shadow-2xl relative">
-          <div className="flex-grow p-6 overflow-y-auto space-y-4">
+        <div className="liquid-glass border border-white/20 rounded-2xl h-[500px] flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden">
+          <div className="flex-grow p-6 overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
             {messages.map((msg, index) => (
               <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] p-4 rounded-lg text-sm leading-relaxed ${msg.sender === 'user'
+                <div className={`max-w-[85%] p-4 rounded-xl text-sm leading-relaxed backdrop-blur-sm shadow-lg ${msg.sender === 'user'
                   ? 'bg-cyan-600 text-white'
-                  : 'bg-[#222] text-gray-200 border border-white/5'
+                  : 'bg-white/10 text-gray-100 border border-white/10'
                   }`}>
-                  {msg.type === 'error' ? <span className="text-red-400">{msg.text}</span> : <p>{msg.text}</p>}
+                  {msg.type === 'error' ? <span className="text-red-400 font-bold">{msg.text}</span> : <p className="drop-shadow-sm">{msg.text}</p>}
                   {msg.type === 'image_upload' && (
                     <div className="mt-3">
-                      <Image src={msg.imageUrl} alt="Uploaded" width={200} height={200} className="rounded-lg border border-white/10 w-full h-auto" unoptimized />
+                      <Image src={msg.imageUrl} alt="Uploaded" width={200} height={200} className="rounded-lg border border-white/20 w-full h-auto shadow-md" unoptimized />
                     </div>
                   )}
                   {msg.type === 'image' && (
                     <div className="mt-3">
-                      <Image src={msg.imageUrl} alt="Generated" width={512} height={512} className="rounded-lg border border-white/10" unoptimized />
+                      <Image src={msg.imageUrl} alt="Generated" width={512} height={512} className="rounded-lg border border-white/20 shadow-md" unoptimized />
                     </div>
                   )}
                   {msg.sender === 'ai' && msg.type !== 'error' && (
-                    <button className="mt-2 text-xs text-gray-500 hover:text-white flex items-center gap-1" onClick={() => speakText(msg.text)}>
+                    <button className="mt-2 text-[10px] uppercase tracking-wider text-cyan-300 hover:text-white flex items-center gap-1 transition-colors" onClick={() => speakText(msg.text)}>
                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" /></svg>
                       Read Aloud
                     </button>
@@ -134,13 +134,13 @@ export default function AskNovus() {
             <div ref={chatEndRef} />
           </div>
 
-          <form onSubmit={handleSubmit} className="p-4 bg-[#111] border-t border-white/10">
+          <form onSubmit={handleSubmit} className="p-4 bg-white/5 border-t border-white/10 backdrop-blur-md relative z-10">
             <div className="flex gap-3 items-center">
               <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" disabled={isLoading} />
-              <button type="button" onClick={() => fileInputRef.current && fileInputRef.current.click()} disabled={isLoading} className="text-gray-400 hover:text-cyan-400 transition-colors p-2" aria-label="Upload Image">
+              <button type="button" onClick={() => fileInputRef.current && fileInputRef.current.click()} disabled={isLoading} className="text-gray-400 hover:text-cyan-400 transition-colors p-2 hover:bg-white/5 rounded-full" aria-label="Upload Image">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
               </button>
-              <button type="button" onClick={startListening} disabled={isLoading} className={`text-gray-400 hover:text-cyan-400 transition-colors p-2 ${isListening ? 'text-red-500 animate-pulse' : ''}`} aria-label="Voice Input">
+              <button type="button" onClick={startListening} disabled={isLoading} className={`text-gray-400 hover:text-cyan-400 transition-colors p-2 hover:bg-white/5 rounded-full ${isListening ? 'text-red-500 animate-pulse' : ''}`} aria-label="Voice Input">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
               </button>
               <input
@@ -148,12 +148,12 @@ export default function AskNovus() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={isLoading ? 'Thinking...' : "Ask a question..."}
-                className="flex-grow bg-[#222] text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-500 border border-white/5 placeholder-gray-600"
+                className="flex-grow bg-black/40 text-white px-5 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-cyan-500/50 border border-white/10 placeholder-white/30 transition-all"
                 disabled={isLoading}
               />
               <button
                 type="submit"
-                className="bg-cyan-600 text-white px-6 py-3 rounded-lg hover:bg-cyan-700 disabled:opacity-50 font-medium transition-colors"
+                className="bg-cyan-600 text-white px-8 py-3 rounded-full hover:bg-cyan-500 disabled:opacity-50 font-bold transition-all shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:shadow-[0_0_30px_rgba(34,211,238,0.5)] transform hover:scale-105 active:scale-95"
                 disabled={isLoading || !input.trim()}
               >
                 Send

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 export default function SiteChatbot() {
   const [isOpen, setIsOpen] = useState(false)
-  const [messages, setMessages] = useState([{ id: 1, sender: 'ai', text: 'Hi! I can help you navigate Novus Exchange. What are you looking for?' }])
+  const [messages, setMessages] = useState([{ id: 1, sender: 'ai', text: 'Hello' }])
   const [input, setInput] = useState('')
   const messagesEndRef = useRef(null)
 
@@ -55,12 +55,12 @@ export default function SiteChatbot() {
         )}
       </button>
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-80 h-[75vh] bg-black border border-white/20 rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden">
-          <div className="bg-red-600 p-4 flex items-center justify-between"><h3 className="font-bold text-white">Novus Assistant</h3></div>
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-black">
+        <div className="fixed bottom-24 right-6 w-80 h-[75vh] liquid-glass z-50 flex flex-col overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.5)]">
+          <div className="bg-cyan-500/20 backdrop-blur-md p-4 flex items-center justify-between border-b border-white/10"><h3 className="font-bold text-white drop-shadow-md">Novus Assistant</h3></div>
+          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-transparent">
             {messages.map((msg) => (
               <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] p-3 rounded-lg text-sm ${msg.sender === 'user' ? 'bg-cyan-600 text-white' : 'bg-gray-700 text-white/90'}`}>
+                <div className={`max-w-[85%] p-3 rounded-lg text-sm ${msg.sender === 'user' ? 'bg-cyan-600 text-white shadow-lg' : 'bg-white/10 text-white border border-white/5 backdrop-blur-sm'}`}>
                   {msg.text}
                   {msg.sender !== 'user' && (
                     <div className="mt-2 flex gap-2">
@@ -73,10 +73,10 @@ export default function SiteChatbot() {
             ))}
             <div ref={messagesEndRef} />
           </div>
-          <form onSubmit={handleSend} className="p-3 bg-black border-t border-white/10">
+          <form onSubmit={handleSend} className="p-3 bg-white/5 border-t border-white/10 backdrop-blur-md">
             <div className="flex gap-2">
-              <input type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type a message..." className="flex-1 bg-white/5 text-white text-sm rounded-full px-4 py-2 focus:outline-none focus:ring-1 focus:ring-cyan-500" />
-              <button type="submit" className="bg-cyan-600 text-white p-2 rounded-full hover:bg-cyan-700">
+              <input type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type a message..." className="flex-1 bg-black/40 text-white text-sm rounded-full px-4 py-2 focus:outline-none focus:ring-1 focus:ring-cyan-500 border border-white/10 placeholder-white/30" />
+              <button type="submit" className="bg-cyan-600 text-white p-2 rounded-full hover:bg-cyan-500 shadow-lg shadow-cyan-900/20 transition-all">
                 <svg className="w-4 h-4 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
               </button>
             </div>
