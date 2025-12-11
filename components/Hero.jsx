@@ -2,9 +2,9 @@ import React from 'react';
 
 export default function Hero() {
   return (
-    <section id="home" className="min-h-screen flex items-center justify-center text-center px-6 pt-24 snap-start">
+    <section id="home" className="min-h-screen flex items-center justify-center text-center px-6 pt-24">
       <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-tight mb-6 text-white">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-tight mb-6 text-white">
           Cut Through The Noise
           <br />
           <span className="text-white">Stay Informed</span>

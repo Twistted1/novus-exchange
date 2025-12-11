@@ -87,7 +87,6 @@
 /* This sets the default dark background and font for your site */
 html {
   scroll-behavior: smooth;
-  scroll-snap-type: y mandatory;
 }
 body {
   background-color: #000000;

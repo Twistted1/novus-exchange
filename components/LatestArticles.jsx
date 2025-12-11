@@ -5,8 +5,8 @@ function ArticleCard({ article, onClick }) {
   const fallbackImage = 'https://placehold.co/1920x1080/1a1a1a/ffffff?text=Novus+Exchange'
   const [imgSrc, setImgSrc] = useState(article.image || fallbackImage)
   return (
-    <div className="bg-white/5 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/10 cursor-pointer group flex flex-col h-full neon-card shine-hover" onClick={onClick} role="button" tabIndex="0" aria-label={`Read article: ${article.title}`} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onClick(e)}>
-      <div className="relative overflow-hidden h-48 w-full">
+    <div className="bg-white/5 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/10 cursor-pointer group flex flex-col aspect-square neon-card shine-hover" onClick={onClick} role="button" tabIndex="0" aria-label={`Read article: ${article.title}`} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onClick(e)}>
+      <div className="relative overflow-hidden h-1/2 w-full">
         <Image fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover transition-transform duration-700 group-hover:scale-110" src={imgSrc} alt={article.title} unoptimized onError={() => setImgSrc(fallbackImage)} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500"></div>
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-blue-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
@@ -103,40 +103,40 @@ function ArticleModal({ articleId, onClose, fallbackArticle }) {
 }
 
 const STATIC_ARTICLES = [
-    {
-      id: '1',
-      image: 'https://placehold.co/1920x1080/1f2937/9ca3af?text=AI+in+Finance',
-      category: 'Artificial Intelligence',
-      title: 'The New Wave: How Generative AI is Reshaping Financial Markets',
-      summary: "From algorithmic trading to risk assessment, AI is no longer just a tool—it's becoming the architect.",
-      author: 'Marcio Rodigues',
-      date: '2025-11-08',
-      readTime: '7 min read',
-      fullText: '<p>Generative AI is rapidly moving from a theoretical concept to a practical powerhouse...</p>'
-    },
-    {
-      id: '2',
-      image: 'https://placehold.co/1920x1080/1e3a8a/60a5fa?text=Global+Supply+Chain',
-      category: 'Economics',
-      title: 'The Great Unwinding: Are Global Supply Chains Permanently Broken?',
-      summary: 'A deep dive into the post-pandemic shifts that are forcing companies to rethink "just-in-time" manufacturing.',
-      author: 'Marcio Rodrigues',
-      date: '2025-11-05',
-      readTime: '6 min read',
-      fullText: '<p>For decades, "just-in-time" (JIT) manufacturing was the gold standard...</p>'
-    },
-    {
-      id: '3',
-      image: 'https://placehold.co/1920x1080/3f6212/a3e635?text=Energy+Transition',
-      category: 'Energy Markets',
-      title: 'The Copper Conundrum: Why the Energy Transition Runs on a Red Metal',
-      summary: 'The world needs to go green, but the green transition requires a massive, unprecedented amount of copper.',
-      author: 'Marcio Rodrigues',
-      date: '2025-11-02',
-      readTime: '5 min read',
-      fullText: '<p>From wind turbines and solar panels to electric vehicles...</p>'
-    }
-  ]
+  {
+    id: '1',
+    image: 'https://placehold.co/1920x1080/1f2937/9ca3af?text=AI+in+Finance',
+    category: 'Artificial Intelligence',
+    title: 'The New Wave: How Generative AI is Reshaping Financial Markets',
+    summary: "From algorithmic trading to risk assessment, AI is no longer just a tool—it's becoming the architect.",
+    author: 'Marcio Rodigues',
+    date: '2025-11-08',
+    readTime: '7 min read',
+    fullText: '<p>Generative AI is rapidly moving from a theoretical concept to a practical powerhouse...</p>'
+  },
+  {
+    id: '2',
+    image: 'https://placehold.co/1920x1080/1e3a8a/60a5fa?text=Global+Supply+Chain',
+    category: 'Economics',
+    title: 'The Great Unwinding: Are Global Supply Chains Permanently Broken?',
+    summary: 'A deep dive into the post-pandemic shifts that are forcing companies to rethink "just-in-time" manufacturing.',
+    author: 'Marcio Rodrigues',
+    date: '2025-11-05',
+    readTime: '6 min read',
+    fullText: '<p>For decades, "just-in-time" (JIT) manufacturing was the gold standard...</p>'
+  },
+  {
+    id: '3',
+    image: 'https://placehold.co/1920x1080/3f6212/a3e635?text=Energy+Transition',
+    category: 'Energy Markets',
+    title: 'The Copper Conundrum: Why the Energy Transition Runs on a Red Metal',
+    summary: 'The world needs to go green, but the green transition requires a massive, unprecedented amount of copper.',
+    author: 'Marcio Rodrigues',
+    date: '2025-11-02',
+    readTime: '5 min read',
+    fullText: '<p>From wind turbines and solar panels to electric vehicles...</p>'
+  }
+]
 
 export default function LatestArticles({ searchQuery }) {
   const [articles, setArticles] = useState(STATIC_ARTICLES)
@@ -156,7 +156,7 @@ export default function LatestArticles({ searchQuery }) {
   })
 
   return (
-    <section id="articles" className="min-h-screen py-32 relative reveal scroll-mt-24 snap-start">
+    <section id="articles" className="min-h-screen py-32 relative reveal scroll-mt-24">
       <div className="max-w-6xl mx-auto px-6">
         <h2 className="text-5xl font-black mb-6 text-center drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">Latest Articles</h2>
         <p className="text-xl text-white/70 mb-16 text-center max-w-2xl mx-auto font-light">In-depth analysis and commentary on critical issues. We go beyond the headlines to provide the full context you need to understand the forces shaping our world.</p>
