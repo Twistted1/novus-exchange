@@ -44,24 +44,12 @@ export default function Header({ searchQuery, setSearchQuery }) {
 function Brand() {
   const [fallback, setFallback] = useState(false)
   return (
-    <a href="#home" className="flex items-center gap-3 shine-hover">
+    <a href="#home" className="flex items-center gap-2">
       {!fallback ? (
-        <div className="flex items-center gap-3">
-          <Image src="/logo.svg" alt="Novus Exchange" width={50} height={50} className="h-12 w-12" unoptimized onError={() => setFallback(true)} />
-          <div className="flex flex-col">
-            <div className="text-lg font-bold tracking-tight text-cyan-400">Novus Exchange</div>
-            <div className="text-[10px] text-gray-400 tracking-wider">Connecting perspectives</div>
-          </div>
-        </div>
+        <img src="/logo.svg" alt="Novus Exchange" className="h-10 w-auto" onError={() => setFallback(true)} />
       ) : (
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
-            <span className="text-white font-black text-lg">NE</span>
-          </div>
-          <div className="flex flex-col">
-            <div className="text-lg font-bold tracking-tight text-cyan-400 drop-shadow-lg neon-text">Novus<span className="text-cyan-400">.</span>Exchange</div>
-            <div className="text-[10px] text-gray-400 tracking-wider">Connecting perspectives</div>
-          </div>
+          <div className="text-xl font-semibold text-white">Novus Exchange</div>
         </div>
       )}
     </a>

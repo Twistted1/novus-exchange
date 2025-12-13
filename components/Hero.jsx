@@ -4,12 +4,12 @@ export default function Hero() {
   return (
     <section id="home" className="min-h-screen flex items-center justify-center text-center px-6 relative z-10">
       <div className="flex flex-col items-center justify-center max-w-5xl mx-auto w-full">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold uppercase tracking-tight leading-tight mb-6 text-white drop-shadow-2xl">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold uppercase tracking-tight leading-tight mb-4 text-white">
           CUT THROUGH THE NOISE
           <br />
           <span className="text-white">STAY INFORMED</span>
         </h1>
-        <p className="text-base md:text-lg text-gray-300 font-light mb-10 max-w-2xl leading-relaxed">
+        <p className="text-sm md:text-base text-gray-400 font-light mb-8 max-w-2xl leading-relaxed">
           Critical, clear-eyed commentary on the issues shaping our world.
         </p>
         <div className="flex flex-col sm:flex-row gap-6">
