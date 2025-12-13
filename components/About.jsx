@@ -4,8 +4,8 @@ export default function About() {
     <section id="about" className="min-h-screen relative reveal scroll-mt-0 flex items-center justify-center py-32 z-10">
       <div className="max-w-6xl mx-auto px-6 w-full">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">About</h2>
-          <p className="text-gray-400 text-base font-light max-w-2xl mx-auto">Our mission, values, and team.</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 tracking-tight">About</h2>
+          <p className="text-gray-400 text-sm font-light max-w-2xl mx-auto">Our mission, values, and team.</p>
         </div>
         <div className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden group">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">

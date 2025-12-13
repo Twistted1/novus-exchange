@@ -100,8 +100,8 @@ export default function AskNovus() {
   return (
     <section id="ask-novus" className="min-h-screen bg-transparent reveal flex items-center justify-center py-32 z-10">
       <div className="container mx-auto px-6 max-w-4xl">
-        <h2 className="text-4xl md:text-5xl font-black mb-4 text-center text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">Ask Novus</h2>
-        <p className="text-base text-gray-400 mb-8 text-center max-w-xl mx-auto font-light">AI-powered research assistant.</p>
+        <h2 className="text-2xl md:text-3xl font-bold mb-3 text-center text-white">Ask Novus</h2>
+        <p className="text-sm text-gray-400 mb-6 text-center max-w-xl mx-auto font-light">AI-powered research assistant.</p>
 
         <div className="bg-[#050505] border border-white/20 rounded-2xl h-[500px] flex flex-col shadow-2xl relative overflow-hidden">
           <div className="flex-grow p-6 overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">

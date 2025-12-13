@@ -158,8 +158,8 @@ export default function LatestArticles({ searchQuery }) {
   return (
     <section id="articles" className="min-h-screen relative reveal scroll-mt-0 flex items-center justify-center py-32 z-10">
       <div className="max-w-7xl mx-auto px-6 w-full">
-        <h2 className="text-4xl md:text-5xl font-black mb-4 text-center drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">Articles</h2>
-        <p className="text-base text-white/70 mb-12 text-center max-w-2xl mx-auto font-light">In-depth analysis and commentary on today's most critical issues.</p>
+        <h2 className="text-2xl md:text-3xl font-bold mb-3 text-center">Articles</h2>
+        <p className="text-sm text-white/70 mb-10 text-center max-w-2xl mx-auto font-light">In-depth analysis and commentary on today's most critical issues.</p>
         {isLoading && <div className="text-center text-cyan-400 animate-pulse text-xl font-mono">LOADING INTELLIGENCE...</div>}
         {!isLoading && (
           filtered.length === 0 ? (

@@ -3,8 +3,8 @@ export default function Contact() {
     <section id="contact" className="min-h-screen relative reveal scroll-mt-0 py-32 z-10 flex items-center justify-center">
       <div className="container mx-auto px-6 max-w-6xl w-full">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">Contact</h2>
-          <p className="text-gray-400 text-base font-light max-w-2xl mx-auto">We'd love to hear from you. Reach out with questions, feedback, or inquiries.</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 tracking-tight">Contact</h2>
+          <p className="text-gray-400 text-sm font-light max-w-2xl mx-auto">We'd love to hear from you. Reach out with questions, feedback, or inquiries.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
