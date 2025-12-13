@@ -47,7 +47,7 @@ export default function Trending() {
     <section id="trending" className="min-h-screen relative bg-black/40 reveal scroll-mt-0 flex items-center justify-center py-32 z-10">
       <div className="max-w-6xl mx-auto px-6 w-full">
         <h2 className="text-2xl md:text-3xl font-bold mb-3 text-center">Global Trending</h2>
-        <p className="text-sm text-white/70 mb-10 text-center max-w-2xl mx-auto font-light">AI-powered summaries of the most pressing geopolitical and economic topics, refreshed twice daily.</p>
+        <p className="text-sm text-white/70 mb-10 text-center max-w-2xl mx-auto font-light">AI-powered summaries of the most pressing geopolitical and economic topics, refreshed daily.</p>
         {loading ? (
           <div className="text-center text-cyan-400 animate-pulse text-xl font-mono">CALCULATING TRENDS...</div>
         ) : (
