@@ -4,7 +4,7 @@ export default function Contact() {
       <div className="container mx-auto px-6 max-w-6xl w-full">
         <div className="text-center mb-16">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 tracking-tight">Contact</h2>
-          <p className="text-sm text-gray-400 font-light max-w-2xl mx-auto">We'd love to hear from you. Reach out with questions, feedback, or inquiries.</p>
+          <p className="text-sm text-gray-400 font-light max-w-2xl mx-auto">We&apos;d love to hear from you. Reach out with questions, feedback, or inquiries.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
