@@ -108,8 +108,8 @@ export default function AskNovus() {
             {messages.map((msg, index) => (
               <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[85%] p-4 rounded-xl text-sm leading-relaxed backdrop-blur-sm shadow-lg ${msg.sender === 'user'
-                  ? 'bg-cyan-600 text-white'
-                  : 'bg-white/10 text-gray-100 border border-white/10'
+                    ? 'bg-white/10 text-white border border-white/20'
+                    : 'bg-white/5 text-gray-100 border border-white/10'
                   }`}>
                   {msg.type === 'error' ? <span className="text-red-400 font-bold">{msg.text}</span> : <p className="drop-shadow-sm">{msg.text}</p>}
                   {msg.type === 'image_upload' && (
