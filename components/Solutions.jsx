@@ -6,7 +6,7 @@ export default function Solutions() {
     { title: 'CMS Enterprise', description: 'The ultimate publishing engine. Advanced roles, multi-site management, and dedicated support for large-scale organizations.', icon: (<svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>), cta: 'Contact Sales', status: 'IN DEVELOPMENT', statusColor: 'text-gray-400 bg-gray-400/10', link: '#contact' }
   ]
   return (
-    <section id="solutions" className="relative reveal scroll-mt-24 py-32 z-10">
+    <section id="solutions" className="min-h-screen relative reveal scroll-mt-0 py-32 z-10 flex items-center justify-center snap-start">
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-black text-white mb-4 drop-shadow-lg">The Novus Ecosystem</h2>

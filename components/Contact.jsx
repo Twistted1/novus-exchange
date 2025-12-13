@@ -1,6 +1,6 @@
 export default function Contact() {
   return (
-    <section id="contact" className="relative reveal scroll-mt-24 mb-32">
+    <section id="contact" className="min-h-screen relative reveal scroll-mt-0 py-32 z-10 flex items-center justify-center snap-start">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-5xl md:text-6xl font-black text-white mb-6 tracking-tight drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">Contact</h2>
