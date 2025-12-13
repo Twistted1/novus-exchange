@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 
 export default function AskNovus() {
-  const [messages, setMessages] = useState([{ id: '1', sender: 'ai', text: "Hello! I'm Novus. How can I assist your research today? You can ask me to analyze topics, create images, or answer questions." }])
+  const [messages, setMessages] = useState([{ id: '1', sender: 'ai', text: 'Hello' }])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
