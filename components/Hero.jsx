@@ -20,7 +20,7 @@ export default function Hero() {
             Read More
           </a>
           <a
-            href="https://youtube.com"
+            href="https://www.youtube.com/@NovusExchange"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-transparent border-2 border-white hover:bg-white hover:text-black text-white font-bold py-3 px-8 rounded-lg transition-all text-sm tracking-wide uppercase flex items-center justify-center gap-2"
