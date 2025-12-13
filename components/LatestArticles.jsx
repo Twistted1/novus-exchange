@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 

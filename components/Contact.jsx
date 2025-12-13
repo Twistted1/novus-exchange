@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 export default function Contact() {
   return (
     <section id="contact" className="min-h-screen relative reveal scroll-mt-0 py-32 z-10 flex items-center justify-center">
