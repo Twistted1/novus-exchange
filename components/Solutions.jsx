@@ -9,8 +9,8 @@ export default function Solutions() {
     <section id="solutions" className="min-h-screen relative reveal scroll-mt-0 py-32 z-10 flex items-center justify-center">
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-5xl font-black text-white mb-4 drop-shadow-lg">The Novus Ecosystem</h2>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto font-light">We don&apos;t just report the news. We build the engines that power the next generation of media companies.</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">The Novus Ecosystem</h2>
+          <p className="text-sm text-gray-400 max-w-2xl mx-auto font-light">We don&apos;t just report the news. We build the engines that power the next generation of media companies.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.map((product, index) => (

@@ -2,20 +2,20 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 
 function TrendCard({ item, onClick }) {
-  const [imgSrc, setImgSrc] = useState(item.image)
-  const fallbackImage = 'https://placehold.co/1920x1080/111111/ffffff?text=Trending'
+  const colors = ['bg-gradient-to-br from-slate-700 to-slate-900', 'bg-gradient-to-br from-blue-700 to-blue-900', 'bg-gradient-to-br from-green-700 to-green-900']
+  const colorIndex = (item.id || 0) % 3
+
   return (
-    <div onClick={onClick} className="bg-white/5 backdrop-blur-xl rounded-2xl overflow-hidden shadow-2xl border border-white/10 transition-all duration-500 group cursor-pointer neon-card shine-hover aspect-video flex flex-col">
-      <div className="relative h-1/2 overflow-hidden w-full">
-        <Image src={imgSrc || fallbackImage} alt={item.title} fill sizes="(min-width:768px) 33vw, 100vw" className="object-cover group-hover:scale-110 transition-transform duration-700" unoptimized onError={() => setImgSrc(fallbackImage)} />
-        <div className="absolute top-3 right-3 bg-red-600/90 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-md shadow-lg border border-red-500/50">Live</div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-60"></div>
+    <div onClick={onClick} className="bg-black/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 cursor-pointer hover:border-white/30 flex flex-col h-full">
+      <div className={`${colors[colorIndex]} h-32 flex items-center justify-center p-6`}>
+        <h3 className="text-xl font-bold text-white text-center">{item.briefTitle || item.title.split(':')[0] || item.title}</h3>
       </div>
-      <div className="p-6">
-        <h3 className="text-lg font-bold leading-snug mb-2 neon-text">{item.title}</h3>
-        <p className="text-xs text-gray-400 line-clamp-3 mb-4">{item.summary}</p>
-        <button onClick={(e) => { e.stopPropagation(); onClick(); }} className="text-cyan-400 text-xs font-medium hover:text-cyan-300 transition-colors flex items-center gap-1">
-          Read Full Analysis →
+      <div className="p-6 flex-1 flex flex-col bg-black/60">
+        <div className="text-cyan-400 text-[10px] font-bold uppercase tracking-widest mb-3">{item.category}</div>
+        <h4 className="text-base font-bold mb-3 text-white leading-tight">{item.title}</h4>
+        <p className="text-xs text-gray-400 line-clamp-3 mb-4 flex-1">{item.summary}</p>
+        <button className="text-cyan-400 text-xs font-medium hover:text-cyan-300 transition-colors flex items-center gap-1 mt-auto uppercase tracking-wide">
+          READ ANALYSIS →
         </button>
       </div>
     </div>
