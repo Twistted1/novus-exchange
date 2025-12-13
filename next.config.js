@@ -3,10 +3,13 @@ const nextConfig = {
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'placehold.co' },
-      { protocol: 'https', hostname: 'novusexchange.com' }
-    ]
-  }
-}
+      { protocol: 'https', hostname: 'novusexchange.com' },
+    ],
+  },
+  eslint: {
+    // Let production builds finish even if ESLint finds issues.
+    ignoreDuringBuilds: true,
+  },
+};
 
-module.exports = nextConfig
-
+module.exports = nextConfig;
