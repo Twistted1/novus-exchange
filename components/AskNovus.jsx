@@ -7,33 +7,49 @@ export default function AskNovus() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [isListening, setIsListening] = useState(false)
+  const [isProcessingVoice, setIsProcessingVoice] = useState(false)
   const fileInputRef = useRef(null)
-  const chatEndRef = useRef(null)
+  const messagesEndRef = useRef(null)
+  const recognitionRef = useRef(null)
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
   }, [messages])
 
   const startListening = () => {
-    if (typeof window === 'undefined') return
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-      const recognition = new SpeechRecognition()
-      recognition.lang = 'en-US'
-      recognition.interimResults = false
-      recognition.maxAlternatives = 1
-      setIsListening(true)
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript
-        setInput(prev => prev + (prev ? ' ' : '') + transcript)
-        setIsListening(false)
-      }
-      recognition.onerror = () => { setIsListening(false) }
-      recognition.onend = () => { setIsListening(false) }
-      recognition.start()
-    } else {
-      alert('Voice input is not supported in this browser.')
+    if (isProcessingVoice) return // Prevent multiple activations
+    if (typeof window === 'undefined' || !('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      setError('Speech recognition is not supported in this browser')
+      return
     }
+    setIsProcessingVoice(true)
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    const recognition = new SpeechRecognition()
+    recognitionRef.current = recognition
+    recognition.lang = 'en-US'
+    recognition.interimResults = false
+    recognition.maxAlternatives = 1
+    recognition.continuous = false
+    recognition.onstart = () => setIsListening(true)
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript
+      setInput(transcript) // Replace instead of append
+      setIsListening(false)
+      setIsProcessingVoice(false)
+    }
+    recognition.onerror = (event) => {
+      console.error(event.error)
+      setError('Speech recognition error')
+      setIsListening(false)
+      setIsProcessingVoice(false)
+    }
+    recognition.onend = () => {
+      setIsListening(false)
+      setIsProcessingVoice(false)
+    }
+    recognition.start()
   }
 
   const callApi = async (payload) => {
@@ -45,14 +61,12 @@ export default function AskNovus() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
-      if (!response.ok) {
-        const err = await response.json()
-        throw new Error(err.error || 'Failed to get response')
-      }
-      return await response.json()
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'AI service unavailable')
+      return data
     } catch (err) {
-      setError(err.message)
-      setMessages(prev => [...prev, { id: Date.now().toString(), sender: 'ai', text: `Error: ${err.message}`, type: 'error' }])
+      setError(err.message || 'Failed to connect')
+      setMessages(prev => [...prev, { id: Date.now().toString(), sender: 'ai', text: 'AI service is currently unavailable. Please check your API configuration.', type: 'error' }])
       return null
     } finally {
       setIsLoading(false)

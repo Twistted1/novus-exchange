@@ -29,15 +29,37 @@ export default function SiteChatbot() {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
     const synth = window.speechSynthesis
     synth.cancel()
-    const utter = new SpeechSynthesisUtterance(text)
-    utter.lang = 'en-US'
-    const voices = synth.getVoices()
-    const preferred = voices.find(v => v.lang.startsWith('en') && /Google|Microsoft|Natural|Neural/i.test(v.name)) || voices.find(v => v.lang.startsWith('en'))
-    if (preferred) utter.voice = preferred
-    utter.rate = 0.95
-    utter.pitch = 1.05
-    utter.volume = 1
-    synth.speak(utter)
+
+    // Wait for voices to load
+    const speak = () => {
+      const utter = new SpeechSynthesisUtterance(text)
+      utter.lang = 'en-US'
+      const voices = synth.getVoices()
+
+      // Find best quality voice - prioritize Google, Microsoft Neural, or Apple
+      const bestVoice = voices.find(v =>
+        v.lang.startsWith('en') && (
+          v.name.includes('Google') ||
+          v.name.includes('Neural') ||
+          v.name.includes('Premium') ||
+          v.name.includes('Enhanced') ||
+          v.name.includes('Samantha') || // macOS
+          v.name.includes('Zira') // Windows
+        )
+      ) || voices.find(v => v.lang.startsWith('en-US')) || voices[0]
+
+      if (bestVoice) utter.voice = bestVoice
+      utter.rate = 1.0
+      utter.pitch = 1.0
+      utter.volume = 1.0
+      synth.speak(utter)
+    }
+
+    if (synth.getVoices().length > 0) {
+      speak()
+    } else {
+      synth.addEventListener('voiceschanged', speak, { once: true })
+    }
   }
 
   function stopSpeak() {
