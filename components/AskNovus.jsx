@@ -103,7 +103,7 @@ export default function AskNovus() {
         <h2 className="text-2xl md:text-3xl font-bold mb-3 text-center text-white">Ask Novus</h2>
         <p className="text-sm text-gray-400 mb-6 text-center max-w-xl mx-auto font-light">AI-powered research assistant.</p>
 
-        <div className="bg-[#050505] border border-white/20 rounded-2xl h-[500px] flex flex-col shadow-2xl relative overflow-hidden">
+        <div className="bg-[#050505] border border-white/20 rounded-2xl h-[600px] flex flex-col shadow-2xl relative overflow-hidden">
           <div className="flex-grow p-6 overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
             {messages.map((msg, index) => (
               <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
