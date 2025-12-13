@@ -74,7 +74,7 @@ export default function SiteChatbot() {
 
   return (
     <>
-      <button onClick={() => setIsOpen(!isOpen)} className="fixed bottom-24 right-6 p-4 bg-red-600 text-white rounded-full shadow-2xl hover:bg-red-700 transition-all z-50" aria-label="Open Site Chat">
+      <button onClick={() => setIsOpen(!isOpen)} className="fixed bottom-24 right-6 p-4 bg-cyan-600 text-white rounded-full shadow-2xl hover:bg-cyan-700 transition-all z-50" aria-label="Open Site Chat">
         {isOpen ? (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         ) : (
@@ -83,7 +83,7 @@ export default function SiteChatbot() {
       </button>
       {isOpen && (
         <div className="fixed bottom-40 right-6 w-96 max-w-[calc(100vw-3rem)] bg-[#050505] border border-white/20 rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden" style={{ height: '600px' }}>
-          <div className="bg-red-600 p-4 flex items-center justify-between">
+          <div className="bg-cyan-600 p-4 flex items-center justify-between">
             <h3 className="font-bold text-white text-base">Novus Assistant</h3>
             <button onClick={() => { setIsOpen(false); stopSpeak(); }} className="text-white/80 hover:text-white transition-colors" aria-label="Close">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
@@ -110,8 +110,8 @@ export default function SiteChatbot() {
           </div>
           <form onSubmit={handleSend} className="p-4 bg-white/5 border-t border-white/10 backdrop-blur-md">
             <div className="flex gap-3 items-center">
-              <input type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type a message..." className="flex-1 bg-black/40 text-white text-sm rounded px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500/50 border border-white/10 placeholder-white/30" />
-              <button type="submit" className="bg-red-600 text-white p-3 rounded-full hover:bg-red-700 transition-all flex items-center justify-center" aria-label="Send">
+              <input type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type a message..." className="flex-1 bg-black/40 text-white text-sm rounded px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 border border-white/10 placeholder-white/30" />
+              <button type="submit" className="bg-cyan-600 text-white p-3 rounded-full hover:bg-cyan-700 transition-all flex items-center justify-center" aria-label="Send">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
