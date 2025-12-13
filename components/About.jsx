@@ -11,7 +11,7 @@ export default function About() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
             <div className="lg:col-span-4 space-y-6 border-l-2 border-cyan-500/50 pl-6 lg:pl-8">
               <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-[0.25em] drop-shadow-md">Novus Exchange</h3>
-              <div className="space-y-6 text-gray-300 text-sm leading-relaxed font-light tracking-wide">
+              <div className="space-y-6 text-gray-300 text-xs leading-relaxed font-light tracking-wide">
                 <p>People deserve more than just headlines. Novus Exchange was founded to provide the full story, challenging conventional narratives and exposing the complexities of pressing issues.</p>
                 <p>Our mission is to inform, provoke thought, and foster discussion by shining a light on the injustices and abuses of power impacting individuals and society.</p>
               </div>
