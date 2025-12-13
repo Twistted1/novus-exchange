@@ -24,7 +24,7 @@ export default function Header({ searchQuery, setSearchQuery }) {
             ))}
           </div>
           <div className="relative">
-            <div className="flex items-center bg-white/5 backdrop-blur-md rounded-full border border-white/10 px-4 py-2 min-w-[200px]">
+            <div className="flex items-center bg-white/5 backdrop-blur-md rounded border border-white/10 px-4 py-2 min-w-[200px]">
               <svg className="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
               <input
                 type="text"
