@@ -15,7 +15,7 @@ export default function Hero() {
         <div className="flex flex-col sm:flex-row gap-6">
           <a
             href="#articles"
-            className="bg-red-600 hover:bg-red-700 text-white font-black py-4 px-10 rounded-full transition-all text-base tracking-widest uppercase shadow-[0_0_30px_rgba(220,38,38,0.5)] hover:shadow-[0_0_50px_rgba(220,38,38,0.7)] hover:scale-105"
+            className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition-all text-sm tracking-wide uppercase"
           >
             Read More
           </a>
@@ -23,7 +23,7 @@ export default function Hero() {
             href="https://youtube.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-transparent border-2 border-white hover:bg-white hover:text-black text-white font-black py-4 px-10 rounded-full transition-all text-base tracking-widest uppercase flex items-center justify-center gap-3 hover:scale-105"
+            className="bg-transparent border-2 border-white hover:bg-white hover:text-black text-white font-bold py-3 px-8 rounded-lg transition-all text-sm tracking-wide uppercase flex items-center justify-center gap-2"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
