@@ -4,12 +4,6 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-snap-type: y mandatory;
-  overflow-y: scroll;
-}
-
-body {
-  scroll-snap-type: y mandatory;
 }
 
 :root {

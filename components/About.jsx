@@ -1,7 +1,7 @@
 export default function About() {
   const playlistSrc = "https://www.youtube.com/embed/videoseries?list=PL-CfrwN0sygN_N7sflltRA_yb9k3WY9uR&autoplay=1&mute=1&loop=1"
   return (
-    <section id="about" className="min-h-screen relative reveal scroll-mt-0 flex items-center justify-center snap-start py-32 z-10">
+    <section id="about" className="min-h-screen relative reveal scroll-mt-0 flex items-center justify-center py-32 z-10">
       <div className="max-w-6xl mx-auto px-6 w-full">
         <div className="text-center mb-16">
           <h2 className="text-5xl md:text-6xl font-black text-white mb-6 tracking-tight drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">About</h2>

@@ -44,7 +44,7 @@ export default function Trending() {
   }, [])
   const [selectedTrend, setSelectedTrend] = useState(null)
   return (
-    <section id="trending" className="min-h-screen relative bg-black/40 reveal scroll-mt-0 flex items-center justify-center snap-start py-32 z-10">
+    <section id="trending" className="min-h-screen relative bg-black/40 reveal scroll-mt-0 flex items-center justify-center py-32 z-10">
       <div className="max-w-6xl mx-auto px-6 w-full">
         <h2 className="text-5xl md:text-6xl font-black mb-6 text-center drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">Global Trending</h2>
         <p className="text-xl text-white/70 mb-16 text-center max-w-2xl mx-auto font-light">AI-powered summaries of the most pressing geopolitical and economic topics, refreshed twice daily.</p>

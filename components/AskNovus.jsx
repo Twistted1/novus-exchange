@@ -98,7 +98,7 @@ export default function AskNovus() {
   }
 
   return (
-    <section id="ask-novus" className="min-h-screen bg-transparent reveal flex items-center justify-center snap-start py-32 z-10">
+    <section id="ask-novus" className="min-h-screen bg-transparent reveal flex items-center justify-center py-32 z-10">
       <div className="container mx-auto px-6 max-w-4xl">
         <h2 className="text-5xl md:text-6xl font-black mb-6 text-center text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">Ask Novus</h2>
         <p className="text-xl text-gray-400 mb-12 text-center max-w-xl mx-auto font-light">AI-powered research assistant.</p>
