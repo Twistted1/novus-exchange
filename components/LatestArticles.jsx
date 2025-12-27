@@ -82,7 +82,7 @@ function ArticleModal({ articleId, onClose, fallbackArticle }) {
         {error && <div className="p-12 text-center text-red-500 font-mono">ERROR: {error}</div>}
         {article && (
           <div className="p-8 md:p-12">
-            <h1 className="text-3xl md:text-5xl font-black mb-8 leading-tight tracking-tight drop-shadow-2xl text-white">{article.title}</h1>
+            <h1 className="text-2xl md:text-4xl font-black mb-8 leading-tight tracking-tight drop-shadow-2xl text-white">{article.title}</h1>
             <div className="flex flex-wrap items-center gap-4 text-xs text-gray-400 mb-10 border-b border-white/10 pb-8 font-mono uppercase tracking-wider">
               <span className="text-cyan-400 font-bold">{article.category}</span>
               <span className="text-white/20">/</span>
@@ -103,47 +103,29 @@ function ArticleModal({ articleId, onClose, fallbackArticle }) {
   )
 }
 
-const STATIC_ARTICLES = [
-  {
-    id: '1',
-    image: 'https://placehold.co/1920x1080/1f2937/9ca3af?text=AI+in+Finance',
-    category: 'Artificial Intelligence',
-    title: 'The New Wave: How Generative AI is Reshaping Financial Markets',
-    summary: "From algorithmic trading to risk assessment, AI is no longer just a tool—it's becoming the architect.",
-    author: 'Marcio Rodigues',
-    date: '2025-11-08',
-    readTime: '7 min read',
-    fullText: '<p>Generative AI is rapidly moving from a theoretical concept to a practical powerhouse...</p>'
-  },
-  {
-    id: '2',
-    image: 'https://placehold.co/1920x1080/1e3a8a/60a5fa?text=Global+Supply+Chain',
-    category: 'Economics',
-    title: 'The Great Unwinding: Are Global Supply Chains Permanently Broken?',
-    summary: 'A deep dive into the post-pandemic shifts that are forcing companies to rethink "just-in-time" manufacturing.',
-    author: 'Marcio Rodrigues',
-    date: '2025-11-05',
-    readTime: '6 min read',
-    fullText: '<p>For decades, "just-in-time" (JIT) manufacturing was the gold standard...</p>'
-  },
-  {
-    id: '3',
-    image: 'https://placehold.co/1920x1080/3f6212/a3e635?text=Energy+Transition',
-    category: 'Energy Markets',
-    title: 'The Copper Conundrum: Why the Energy Transition Runs on a Red Metal',
-    summary: 'The world needs to go green, but the green transition requires a massive, unprecedented amount of copper.',
-    author: 'Marcio Rodrigues',
-    date: '2025-11-02',
-    readTime: '5 min read',
-    fullText: '<p>From wind turbines and solar panels to electric vehicles...</p>'
-  }
-]
-
 export default function LatestArticles({ searchQuery }) {
-  const [articles, setArticles] = useState(STATIC_ARTICLES)
+  const [articles, setArticles] = useState([])
   const [selectedArticleId, setSelectedArticleId] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const lastClickedArticleRef = useRef(null)
+
+  useEffect(() => {
+    async function fetchArticles() {
+      try {
+        const res = await fetch('/api/articles')
+        if (res.ok) {
+          const data = await res.json()
+          setArticles(data.articles || [])
+        }
+      } catch (err) {
+        console.error('Failed to fetch articles', err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchArticles()
+  }, [])
+
 
   useEffect(() => {
     const onKeyDown = (e) => { if (e.key === 'Escape') setSelectedArticleId(null) }

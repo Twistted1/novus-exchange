@@ -4,7 +4,7 @@ export default function Hero() {
   return (
     <section id="home" className="min-h-screen flex items-center justify-center text-center px-6 relative z-10">
       <div className="flex flex-col items-center justify-center max-w-5xl mx-auto w-full">
-        <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold uppercase tracking-tight leading-tight mb-4 text-white">
+        <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg animate-fade-in-up">
           CUT THROUGH THE NOISE
           <br />
           <span className="text-white">STAY INFORMED</span>

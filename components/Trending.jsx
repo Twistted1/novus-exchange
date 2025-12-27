@@ -6,7 +6,7 @@ function TrendCard({ item, onClick }) {
   const colorIndex = (item.id || 0) % 3
 
   return (
-    <div onClick={onClick} className="bg-black/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 cursor-pointer hover:border-white/30 flex flex-col h-full">
+    <div onClick={onClick} className="bg-white/5 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 cursor-pointer flex flex-col h-full neon-card glow-move shine-hover">
       <div className={`${colors[colorIndex]} h-32 flex items-center justify-center p-6`}>
         <h3 className="text-xl font-bold text-white text-center">{item.briefTitle || item.title.split(':')[0] || item.title}</h3>
       </div>
@@ -44,7 +44,7 @@ export default function Trending() {
   }, [])
   const [selectedTrend, setSelectedTrend] = useState(null)
   return (
-    <section id="trending" className="min-h-screen relative bg-black/40 reveal scroll-mt-0 flex items-center justify-center py-32 z-10">
+    <section id="trending" className="min-h-screen relative reveal scroll-mt-0 flex items-center justify-center py-32 z-10">
       <div className="max-w-6xl mx-auto px-6 w-full">
         <h2 className="text-2xl md:text-3xl font-bold mb-3 text-center">Global Trending</h2>
         <p className="text-sm text-white/70 mb-10 text-center max-w-2xl mx-auto font-light">AI-powered summaries of the most pressing geopolitical and economic topics, refreshed daily.</p>

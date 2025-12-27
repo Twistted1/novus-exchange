@@ -4,11 +4,42 @@ export default function SiteChatbot() {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState([{ id: 1, sender: 'ai', text: 'Hello' }])
   const [input, setInput] = useState('')
+  const [isListening, setIsListening] = useState(false)
   const messagesEndRef = useRef(null)
+  const [error, setError] = useState(null) // Added for error messages
+  const isMounted = useRef(false) // Added for useEffect scrolling logic
 
   useEffect(() => {
-    if (isOpen) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, isOpen])
+    if (isMounted.current && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    } else {
+      isMounted.current = true
+    }
+  }, [messages])
+
+  const startListening = () => {
+    if (typeof window === 'undefined' || !('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      setError('Speech recognition is not supported in this browser')
+      return
+    }
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    const recognition = new SpeechRecognition()
+    recognition.lang = 'en-US'
+    recognition.interimResults = false
+    recognition.maxAlternatives = 1
+    recognition.onstart = () => setIsListening(true)
+    recognition.onend = () => setIsListening(false)
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript
+      setInput(transcript)
+    }
+    recognition.onerror = (event) => {
+      console.error(event.error)
+      setError('Voice input failed. Please try again.')
+      setIsListening(false)
+    }
+    recognition.start()
+  }
 
   async function handleSend(e) {
     e.preventDefault()
@@ -111,6 +142,9 @@ export default function SiteChatbot() {
           <form onSubmit={handleSend} className="p-4 bg-white/5 border-t border-white/10 backdrop-blur-md">
             <div className="flex gap-3 items-center">
               <input type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type a message..." className="flex-1 bg-black/40 text-white text-sm rounded px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 border border-white/10 placeholder-white/30" />
+              <button type="button" onClick={startListening} className={`p-3 rounded-full transition-all flex items-center justify-center ${isListening ? 'bg-red-500/20 text-red-500 animate-pulse' : 'text-gray-400 hover:text-cyan-400 hover:bg-white/5'}`} aria-label="Voice Input">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
+              </button>
               <button type="submit" className="bg-cyan-600 text-white p-3 rounded-full hover:bg-cyan-700 transition-all flex items-center justify-center" aria-label="Send">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />

@@ -15,20 +15,20 @@ export default async function handler(req, res) {
   ]
 
   try {
-    const provider = process.env.AI_PROVIDER || 'vertex'
+    const provider = process.env.AI_PROVIDER
     const prompt = `Generate 3 completely fictional but realistic "Global Trending" news headlines for today. 
     Format as a valid JSON array of objects with keys: "id" (number), "title" (string), "summary" (short string), "details" (longer paragraph), "image" (use a placeholder URL like https://placehold.co/1080x1080/222/fff?text=Topic).
     Do NOT use Markdown. Return ONLY the JSON string.`
 
     let jsonText = ''
 
-    if (process.env.VERTEX_PROJECT_ID && process.env.VERTEX_LOCATION) {
+    if (provider === 'vertex' && process.env.VERTEX_PROJECT_ID && process.env.VERTEX_LOCATION) {
       const vertex = new VertexAI({ project: process.env.VERTEX_PROJECT_ID, location: process.env.VERTEX_LOCATION })
       const model = vertex.getGenerativeModel({ model: 'gemini-1.5-flash' })
       const result = await model.generateContent(prompt)
       jsonText = result.response.text()
-    } else if (process.env.GEMINI_API_KEY) {
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+    } else if ((provider === 'gemini' || !provider) && (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY)) {
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY)
       const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
       const result = await model.generateContent(prompt)
       jsonText = result.response.text()

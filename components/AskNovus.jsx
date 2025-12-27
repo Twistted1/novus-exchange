@@ -10,12 +10,15 @@ export default function AskNovus() {
   const [isProcessingVoice, setIsProcessingVoice] = useState(false)
   const fileInputRef = useRef(null)
   const messagesEndRef = useRef(null)
+  const listRef = useRef(null)
   const recognitionRef = useRef(null)
 
+  const isMounted = useRef(false)
+
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
-    }
+    if (!isMounted.current) { isMounted.current = true; return }
+    const el = listRef.current
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
   }, [messages])
 
   const startListening = () => {
@@ -117,8 +120,8 @@ export default function AskNovus() {
         <h2 className="text-2xl md:text-3xl font-bold mb-3 text-center text-white">Ask Novus</h2>
         <p className="text-sm text-gray-400 mb-6 text-center max-w-xl mx-auto font-light">AI-powered research assistant.</p>
 
-        <div className="bg-[#050505] border border-white/20 rounded-2xl h-[600px] flex flex-col shadow-2xl relative overflow-hidden">
-          <div className="flex-grow p-6 overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl h-[600px] flex flex-col shadow-2xl relative overflow-hidden neon-card glow-move shine-hover">
+          <div ref={listRef} className="flex-grow p-6 overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
             {messages.map((msg, index) => (
               <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[85%] p-4 rounded-xl text-sm leading-relaxed backdrop-blur-sm shadow-lg ${msg.sender === 'user'

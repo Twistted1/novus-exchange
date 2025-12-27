@@ -1,8 +1,28 @@
+"use client";
+
+import { useState } from 'react'
+import useReveal from '../hooks/useReveal'
+import Hero from '../components/Hero'
+import About from '../components/About'
+import Solutions from '../components/Solutions'
+import LatestArticles from '../components/LatestArticles'
+import Trending from '../components/Trending'
+import AskNovus from '../components/AskNovus'
+import Contact from '../components/Contact'
+
 export default function Home() {
+  useReveal()
+  const [searchQuery, setSearchQuery] = useState('')
+
   return (
-    <main className="min-h-screen text-white p-8">
-      <h1 className="text-3xl font-bold">Novus Exchange</h1>
-      <p className="mt-4 opacity-80">Home is up. Replace this with your real component.</p>
+    <main className="min-h-screen text-white">
+      <Hero />
+      <About />
+      <LatestArticles searchQuery={searchQuery} />
+      <Trending />
+      <AskNovus />
+      <Solutions />
+      <Contact />
     </main>
-  );
+  )
 }
