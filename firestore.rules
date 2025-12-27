@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow reading published posts
+    match /posts/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    // Block everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
