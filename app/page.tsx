@@ -16,11 +16,11 @@ export default function Home() {
 
   return (
     <main className="min-h-screen text-white">
-      <Hero />
+      <Hero onNavClick={() => {}} />
       <About />
       <LatestArticles searchQuery={searchQuery} />
       <Trending />
-      <AskNovus />
+      <AskNovus onSearch={() => {}} />
       <Solutions />
       <Contact />
     </main>
