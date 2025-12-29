@@ -1,6 +1,44 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore'
+import { db } from '../src/components/lib/firebase'
+
+const fallbackArticles = [
+  {
+    id: 'placeholder-1',
+    title: 'The Future of AI in Global Finance',
+    summary: 'How artificial intelligence is reshaping market strategies and predictive analytics in the financial sector.',
+    fullText: '<p>Artificial Intelligence is revolutionary...</p>',
+    image: 'https://placehold.co/1920x1080/1a1a1a/ffffff?text=AI+Finance',
+    category: 'Technology',
+    author: 'Novus AI',
+    date: new Date().toLocaleDateString(),
+    readTime: '5 min read'
+  },
+  {
+    id: 'placeholder-2',
+    title: '2025 Market Outlook: Emerging Trends',
+    summary: 'A comprehensive analysis of emerging markets and the shift towards digital assets in the coming year.',
+    fullText: '<p>The markets are shifting...</p>',
+    image: 'https://placehold.co/1920x1080/1a1a1a/ffffff?text=Market+Outlook',
+    category: 'Economy',
+    author: 'Novus Analyst',
+    date: new Date().toLocaleDateString(),
+    readTime: '7 min read'
+  },
+  {
+    id: 'placeholder-3',
+    title: 'Sustainable Energy: The New Gold Rush',
+    summary: 'Why renewable energy investments are silently outperforming traditional assets in the long-term portfolio.',
+    fullText: '<p>Renewable energy is not just...</p>',
+    image: 'https://placehold.co/1920x1080/1a1a1a/ffffff?text=Clean+Energy',
+    category: 'Energy',
+    author: 'Eco Tech',
+    date: new Date().toLocaleDateString(),
+    readTime: '6 min read'
+  }
+];
 
 function ArticleCard({ article, onClick }) {
   const fallbackImage = 'https://placehold.co/1920x1080/1a1a1a/ffffff?text=Novus+Exchange'
@@ -112,15 +150,40 @@ export default function LatestArticles({ searchQuery }) {
   useEffect(() => {
     async function fetchArticles() {
       try {
-        const res = await fetch('/api/articles')
-        if (res.ok) {
-          const data = await res.json()
-          setArticles(data.articles || [])
+        setIsLoading(true);
+        // Query 'posts' collection for Published articles from CMS
+        const q = query(
+          collection(db, 'posts'),
+          where('status', '==', 'Published'),
+          orderBy('createdAt', 'desc'),
+          limit(9)
+        );
+        const querySnapshot = await getDocs(q);
+
+        let fetchedArticles = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            title: data.title || 'Untitled',
+            summary: data.content ? data.content.substring(0, 150).replace(/<[^>]*>?/gm, '') + '...' : 'No summary available.',
+            fullText: data.content || '', // HTML content for Modal
+            image: data.imageUrl || 'https://placehold.co/1920x1080/1a1a1a/ffffff?text=Novus+Exchange',
+            category: data.platform || 'General',
+            author: 'Marcio Novus', // Can map data.userId if available
+            date: data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString() : 'Recently',
+            readTime: '5 min read'
+          };
+        });
+
+        if (fetchedArticles.length === 0) {
+          fetchedArticles = fallbackArticles;
         }
+
+        setArticles(fetchedArticles);
       } catch (err) {
-        console.error('Failed to fetch articles', err)
+        console.error('Failed to fetch articles from CMS:', err);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
     fetchArticles()

@@ -7,7 +7,7 @@ import About from '../components/About'
 import Solutions from '../components/Solutions'
 import LatestArticles from '../components/LatestArticles'
 import Trending from '../components/Trending'
-import AskNovus from '../components/AskNovus'
+
 import Contact from '../components/Contact'
 
 export default function Home() {
@@ -16,11 +16,11 @@ export default function Home() {
 
   return (
     <main className="min-h-screen text-white">
-      <Hero onNavClick={() => {}} />
+      <Hero />
       <About />
       <LatestArticles searchQuery={searchQuery} />
       <Trending />
-      <AskNovus onSearch={() => {}} />
+
       <Solutions />
       <Contact />
     </main>

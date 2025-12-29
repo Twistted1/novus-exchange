@@ -141,7 +141,7 @@ export default function NoveeAssistant() {
         {/* Video (Active State) - Overlays on hover */}
         <video
           ref={videoRef}
-          src="/videos/novee-wave.mp4"
+          src="/novee-wave.mp4"
           className={`absolute inset-0 z-20 w-full h-full object-cover rounded-full transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
           muted
           loop

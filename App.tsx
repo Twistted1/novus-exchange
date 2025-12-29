@@ -11,7 +11,7 @@ import ArticlePage from './components/articles/ArticlePage';
 import AuthorPage from './components/author/AuthorPage';
 import GlobalTrending from './components/GlobalTrending';
 import Contact from './components/Contact';
-import AskNovus from './components/AskNovus';
+// import AskNovus from './components/AskNovus';
 import Chatbot from './components/Chatbot';
 
 // Configuration constants
@@ -48,7 +48,7 @@ const App: React.FC = () => {
     const trendingRef = useRef<HTMLElement>(null);
     const askNovusRef = useRef<HTMLElement>(null);
     const contactRef = useRef<HTMLElement>(null);
-    
+
     // Check for API Key on startup
     useEffect(() => {
         // API key check disabled
@@ -85,7 +85,7 @@ const App: React.FC = () => {
             .filter((el): el is HTMLElement => el !== null);
 
         elements.forEach(el => observer.observe(el));
-        
+
         return () => {
             elements.forEach(el => observer.unobserve(el));
             observer.disconnect();
@@ -114,7 +114,7 @@ const App: React.FC = () => {
     }, [debouncedQuery]);
 
     // Memoize articles context for chatbot (only rebuild if articles change)
-    const articlesContext = useMemo(() => 
+    const articlesContext = useMemo(() =>
         allArticles.map(article =>
             `Title: ${article.title}\nExcerpt: ${article.excerpt}`
         ).join('\n\n'),
@@ -173,11 +173,11 @@ const App: React.FC = () => {
             text: message,
         };
         const loadingMessage: NovusMessage = { id: Date.now() + 1, source: 'model', isLoading: true };
-        
+
         setMessages(prev => {
             const updated = [...prev, userMessage, loadingMessage];
-            return updated.length > DISPLAY_LIMITS.MAX_CHAT_MESSAGES 
-                ? updated.slice(-DISPLAY_LIMITS.MAX_CHAT_MESSAGES) 
+            return updated.length > DISPLAY_LIMITS.MAX_CHAT_MESSAGES
+                ? updated.slice(-DISPLAY_LIMITS.MAX_CHAT_MESSAGES)
                 : updated;
         });
 
@@ -192,7 +192,7 @@ const App: React.FC = () => {
                     systemInstruction: "You are Novus, a specialized AI assistant for the 'Novus Exchange' website. Your sole purpose is to answer user questions about the website, its articles, its mission, and its author. You must be an expert on the provided article summaries. You cannot create images or answer questions outside of this context. If asked something unrelated, politely state that you can only answer questions about Novus Exchange.",
                 }
             });
-            
+
             const modelResponse: NovusMessage = {
                 id: Date.now() + 2,
                 source: 'model',
@@ -202,9 +202,9 @@ const App: React.FC = () => {
 
         } catch (error: any) {
             console.error("AI content generation error:", error);
-            
+
             let errorMessageText = "I'm sorry, an error occurred. ";
-            
+
             if (error.message?.includes('API key') || error.message?.includes('api_key')) {
                 errorMessageText += "The API key is invalid or expired. Please contact the site administrator.";
             } else if (error.message?.includes('quota') || error.message?.includes('limit')) {
@@ -214,7 +214,7 @@ const App: React.FC = () => {
             } else {
                 errorMessageText += `Technical details: ${error.message || 'The AI assistant is temporarily unavailable.'}`;
             }
-            
+
             const errorMessage: NovusMessage = {
                 id: Date.now() + 2,
                 source: 'model',
@@ -223,13 +223,13 @@ const App: React.FC = () => {
             setMessages(prev => [...prev.slice(0, -1), errorMessage]);
         }
     }, [articlesContext]);
-    
+
     const handleAskNovusHighlight = useCallback((text: string) => {
         const prompt = `A user highlighted the following text from one of our articles: "${text}"\n\nPlease provide a brief, insightful comment or a related question to encourage deeper thinking.`;
         handleChatbotSendMessage(prompt);
         setIsChatbotOpen(true);
     }, [handleChatbotSendMessage]);
-    
+
     const renderContent = () => {
         if (activePage === Page.Author && selectedAuthor) {
             const authorArticles = allArticles.filter(a => a.author.id === selectedAuthor.id);
@@ -239,10 +239,10 @@ const App: React.FC = () => {
         if (activePage === Page.Article && selectedArticle) {
             return <ArticlePage article={selectedArticle} articles={allArticles} onBack={handleBackToHome} onSelectArticle={handleSelectArticle} onSelectAuthor={handleSelectAuthor} onAskNovusHighlight={handleAskNovusHighlight} />;
         }
-        
+
         const sectionClasses = "min-h-screen scroll-mt-20 flex items-center justify-center px-4 sm:px-6 md:px-8";
         const contentWrapperClasses = "container mx-auto w-full -translate-y-10";
-        
+
         return (
             <>
                 <section id={Page.Home} className="relative min-h-screen flex items-center justify-center">
@@ -271,7 +271,8 @@ const App: React.FC = () => {
                                 Your intelligent research partner. Analyze topics, generate images, and get answers with voice or text.
                             </p>
                         </div>
-                        <AskNovus onSearch={setSearchQuery} />
+                        {/* <AskNovus onSearch={setSearchQuery} /> */}
+                        <div className="text-white text-center py-10">Ask Novus is currently under maintenance.</div>
                     </div>
                 </section>
 
@@ -285,17 +286,17 @@ const App: React.FC = () => {
     if (!isApiConfigured) {
         return (
             <div className="bg-black text-gray-100 font-sans min-h-screen flex items-center justify-center p-4">
-                 <div className="fixed top-0 left-0 w-full h-full bg-gradient-to-br from-gray-900 via-black to-blue-900/40 z-0 bg-pan-animation"></div>
-                 <div className="relative z-10 max-w-2xl w-full text-center">
-                    <div 
-                        role="alert" 
+                <div className="fixed top-0 left-0 w-full h-full bg-gradient-to-br from-gray-900 via-black to-blue-900/40 z-0 bg-pan-animation"></div>
+                <div className="relative z-10 max-w-2xl w-full text-center">
+                    <div
+                        role="alert"
                         aria-live="assertive"
                         className="bg-red-900/50 border border-red-500/50 rounded-2xl p-8 backdrop-blur-lg"
                     >
                         <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center shrink-0 border border-red-500/50 mb-4 mx-auto">
-                          <svg className="w-8 h-8 text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                          </svg>
+                            <svg className="w-8 h-8 text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                            </svg>
                         </div>
                         <h1 className="text-3xl font-bold text-white mb-3">Configuration Error</h1>
                         <p className="text-red-200 text-lg mb-6">
@@ -311,7 +312,7 @@ const App: React.FC = () => {
                             </ol>
                         </div>
                     </div>
-                 </div>
+                </div>
             </div>
         );
     }
@@ -319,9 +320,9 @@ const App: React.FC = () => {
     return (
         <div className="bg-black text-gray-100 font-sans">
             <div className="fixed top-0 left-0 w-full h-full bg-gradient-to-br from-gray-900 via-black to-blue-900/40 z-0 bg-pan-animation"></div>
-            
-            <Layout 
-                activePage={activePage} 
+
+            <Layout
+                activePage={activePage}
                 onNavClick={handleNavClick}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
@@ -329,8 +330,8 @@ const App: React.FC = () => {
                 {renderContent()}
             </Layout>
 
-            <Chatbot 
-                isOpen={isChatbotOpen} 
+            <Chatbot
+                isOpen={isChatbotOpen}
                 setIsOpen={setIsChatbotOpen}
                 messages={messages}
                 onSendMessage={handleChatbotSendMessage}

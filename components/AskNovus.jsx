@@ -105,8 +105,8 @@ export default function AskNovus() {
     setMessages(prev => [...prev, userMessage])
     setInput('')
 
-    // ✅ ONLY FIX HERE
-    const result = await callApi({ message: userMessage.text })
+    // ✅ FIXED: Using 'prompt' to match API expectation
+    const result = await callApi({ prompt: userMessage.text })
 
     if (result) {
       setMessages(prev => [
@@ -146,7 +146,7 @@ export default function AskNovus() {
 
       // ✅ SAME FIX HERE
       const result = await callApi({
-        message: 'Analyze this image and provide a detailed description.',
+        prompt: 'Analyze this image and provide a detailed description.',
         imageData: base64Image,
         mimeType
       })
@@ -168,12 +168,16 @@ export default function AskNovus() {
   }
 
   return (
-    <section id="ask-novus" className="min-h-screen bg-transparent reveal flex items-center justify-center py-32 z-10">
+    <section id="ask-novus" className="min-h-screen bg-transparent reveal flex items-center justify-center py-24 z-10">
       <div className="container mx-auto px-6 max-w-4xl">
-        <h2 className="text-2xl md:text-3xl font-bold mb-3 text-center text-white">Ask Novus</h2>
-        <p className="text-sm text-gray-400 mb-6 text-center max-w-xl mx-auto font-light">AI-powered research assistant.</p>
+        <div className="text-center mb-10">
+          <h2 className="text-2xl md:text-3xl font-bold mb-3 text-white tracking-tight">Ask Novus</h2>
+          <p className="text-sm text-gray-400 font-light max-w-xl mx-auto">
+            Your personal AI research companion. Analyze documents, summarize articles, and explore complex topics with depth and clarity.
+          </p>
+        </div>
 
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl h-[600px] flex flex-col shadow-2xl relative overflow-hidden">
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl h-[600px] flex flex-col shadow-2xl relative overflow-hidden mb-6">
           <div ref={listRef} className="flex-grow p-6 overflow-y-auto space-y-4">
             {messages.map((msg, index) => (
               <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -202,6 +206,12 @@ export default function AskNovus() {
               <button type="submit" disabled={isLoading || !input.trim()}>➤</button>
             </div>
           </form>
+        </div>
+
+        <div className="text-center">
+          <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">
+            Novus AI is powered by advanced language models. Information provided should be verified.
+          </p>
         </div>
       </div>
     </section>

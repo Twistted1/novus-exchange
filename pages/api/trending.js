@@ -1,5 +1,4 @@
 import { VertexAI } from '@google-cloud/vertexai'
-import { GoogleGenerativeAI } from '@google/generative-ai'
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -22,17 +21,29 @@ export default async function handler(req, res) {
 
     let jsonText = ''
 
-    if (provider === 'vertex' && process.env.VERTEX_PROJECT_ID && process.env.VERTEX_LOCATION) {
+    if (process.env.VERTEX_PROJECT_ID && process.env.VERTEX_LOCATION) {
+      console.log('Fetching trending via Vertex AI...');
       const vertex = new VertexAI({ project: process.env.VERTEX_PROJECT_ID, location: process.env.VERTEX_LOCATION })
       const model = vertex.getGenerativeModel({ model: 'gemini-1.5-flash' })
       const result = await model.generateContent(prompt)
       jsonText = result.response.text()
-    } else if ((provider === 'gemini' || !provider) && (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY)) {
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY)
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
-      const result = await model.generateContent(prompt)
-      jsonText = result.response.text()
+    } else if (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY) {
+      console.log('Fetching trending via Cloud Gemini API...');
+      const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+      });
+
+      if (!response.ok) throw new Error(`Gemini API Error: ${response.statusText}`);
+
+      const data = await response.json();
+      jsonText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     } else {
+      console.warn('No AI credentials found. Using fallback data.');
       return res.status(200).json({ trending: fallbackData })
     }
 
