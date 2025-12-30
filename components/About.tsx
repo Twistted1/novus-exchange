@@ -25,7 +25,7 @@ const About: React.FC = () => {
             <div className="w-full aspect-video rounded-xl overflow-hidden shadow-lg md:col-span-2">
               <iframe
                 className="w-full h-full"
-                src={`https://www.youtube.com/embed/${videoId}?list=${playlistId}&autoplay=1&mute=1&loop=1&controls=1&rel=0&modestbranding=1`}
+                src={`https://www.youtube.com/embed?listType=playlist&list=${playlistId}&autoplay=1&mute=1&loop=1&controls=1&rel=0&modestbranding=1`}
                 title="YouTube video player for Novus Exchange"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

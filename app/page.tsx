@@ -6,7 +6,7 @@ import Hero from '../components/Hero'
 import About from '../components/About'
 import Solutions from '../components/Solutions'
 import LatestArticles from '../components/LatestArticles'
-import Trending from '../components/Trending'
+import GlobalTrending from '../components/GlobalTrending'
 
 import Contact from '../components/Contact'
 
@@ -19,7 +19,7 @@ export default function Home() {
       <Hero />
       <About />
       <LatestArticles searchQuery={searchQuery} />
-      <Trending />
+      <GlobalTrending />
 
       <Solutions />
       <Contact />

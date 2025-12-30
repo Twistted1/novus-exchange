@@ -42,4 +42,5 @@ export type AskNovusHighlightFn = (text: string) => void;
 export interface Trend {
   topic: string;
   summary: string;
+  details?: string;
 }

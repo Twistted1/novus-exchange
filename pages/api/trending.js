@@ -6,6 +6,9 @@ export default async function handler(req, res) {
     return
   }
 
+  // Cache for 24 hours
+  res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=43200');
+
   // Fallback static data in case AI fails
   const fallbackData = [
     { id: 1, title: 'Global AI Summit Hits Record Attendance', image: 'https://placehold.co/1920x1080/0f172a/cbd5e1?text=Global+AI+Summit', summary: 'World leaders and tech giants convene to discuss safe AI regulation and future economic impacts.', details: 'The 2025 Global AI Summit has concluded with a landmark agreement on safety standards. Representatives from over 50 nations tailored a new framework...' },

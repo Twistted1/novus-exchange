@@ -1,6 +1,6 @@
 import '../styles/globals.css'
 import Header from '../components/Header'
-// import NoveeAssistant from '../components/NoveeAssistant'
+import NoveeAssistant from '../components/NoveeAssistant'
 
 export default function MyApp({ Component, pageProps }) {
   return (
@@ -9,7 +9,7 @@ export default function MyApp({ Component, pageProps }) {
       <div className="pt-24">
         <Component {...pageProps} />
       </div>
-      {/* <NoveeAssistant /> */}
+      <NoveeAssistant />
       <div id="novee-root" />
     </div>
   )

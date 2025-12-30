@@ -2,37 +2,22 @@ import React, { useState, useEffect } from 'react';
 import GlassCard from './GlassCard';
 import { Trend } from '../types';
 import { renderMarkdown } from '../utils';
-import { GoogleGenAI, Type } from '@google/genai';
+
+// Removed client-side GoogleGenAI import to prevent exposure/errors
 
 interface GlobalTrendingProps {
 }
 
-// Define the expected JSON schema for the AI response to improve readability.
-const trendsSchema = {
-    type: Type.OBJECT,
-    properties: {
-        trends: {
-            type: Type.ARRAY,
-            items: {
-                type: Type.OBJECT,
-                properties: {
-                    topic: { type: Type.STRING },
-                    summary: { type: Type.STRING }
-                },
-                required: ["topic", "summary"]
-            }
-        }
-    },
-    required: ["trends"]
-};
+// Schema removed as we are fetching from API
+
 
 const TrendCard: React.FC<{ trend: Trend, style?: React.CSSProperties, onSelect: () => void }> = ({ trend, style, onSelect }) => (
   <GlassCard className="flex flex-col p-6 aspect-square" style={style}>
     <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">{trend.topic}</h3>
     <p className="text-gray-300 text-sm flex-grow line-clamp-3">{trend.summary}</p>
     <div className="mt-auto pt-4 border-t border-white/10">
-      <button 
-        onClick={onSelect} 
+      <button
+        onClick={onSelect}
         className="font-semibold text-cyan-400 hover:text-cyan-300 transition-colors text-sm"
       >
         Read Full Analysis &rarr;
@@ -42,30 +27,30 @@ const TrendCard: React.FC<{ trend: Trend, style?: React.CSSProperties, onSelect:
 );
 
 const SkeletonCard: React.FC<{ style?: React.CSSProperties }> = ({ style }) => (
-    <GlassCard className="flex flex-col p-6 aspect-square animate-pulse" style={style}>
-      <div className="h-6 bg-gray-600/50 rounded w-3/4 mb-4"></div>
-      <div className="space-y-2 flex-grow">
-        <div className="h-4 bg-gray-600/50 rounded w-full"></div>
-        <div className="h-4 bg-gray-600/50 rounded w-5/6"></div>
-        <div className="h-4 bg-gray-600/50 rounded w-full"></div>
-      </div>
-    </GlassCard>
+  <GlassCard className="flex flex-col p-6 aspect-square animate-pulse" style={style}>
+    <div className="h-6 bg-gray-600/50 rounded w-3/4 mb-4"></div>
+    <div className="space-y-2 flex-grow">
+      <div className="h-4 bg-gray-600/50 rounded w-full"></div>
+      <div className="h-4 bg-gray-600/50 rounded w-5/6"></div>
+      <div className="h-4 bg-gray-600/50 rounded w-full"></div>
+    </div>
+  </GlassCard>
 );
 
 const ArticleSkeletonLoader: React.FC = () => (
-    <div className="animate-pulse max-w-4xl mx-auto">
-        <div className="h-6 bg-gray-600/50 rounded w-1/4 mb-8"></div>
-        <div className="h-10 bg-gray-600/50 rounded w-3/4 mb-6"></div>
-        <div className="h-6 bg-gray-600/50 rounded w-full mb-8 pb-8"></div>
-        <div className="space-y-4">
-            <div className="h-5 bg-gray-600/50 rounded w-full"></div>
-            <div className="h-5 bg-gray-600/50 rounded w-full"></div>
-            <div className="h-5 bg-gray-600/50 rounded w-5/6"></div>
-            <div className="h-5 bg-gray-600/50 rounded w-1/2 mb-8"></div>
-            <div className="h-5 bg-gray-600/50 rounded w-full"></div>
-            <div className="h-5 bg-gray-600/50 rounded w-5/6"></div>
-        </div>
+  <div className="animate-pulse max-w-4xl mx-auto">
+    <div className="h-6 bg-gray-600/50 rounded w-1/4 mb-8"></div>
+    <div className="h-10 bg-gray-600/50 rounded w-3/4 mb-6"></div>
+    <div className="h-6 bg-gray-600/50 rounded w-full mb-8 pb-8"></div>
+    <div className="space-y-4">
+      <div className="h-5 bg-gray-600/50 rounded w-full"></div>
+      <div className="h-5 bg-gray-600/50 rounded w-full"></div>
+      <div className="h-5 bg-gray-600/50 rounded w-5/6"></div>
+      <div className="h-5 bg-gray-600/50 rounded w-1/2 mb-8"></div>
+      <div className="h-5 bg-gray-600/50 rounded w-full"></div>
+      <div className="h-5 bg-gray-600/50 rounded w-5/6"></div>
     </div>
+  </div>
 );
 
 const GlobalTrending: React.FC<GlobalTrendingProps> = () => {
@@ -80,53 +65,28 @@ const GlobalTrending: React.FC<GlobalTrendingProps> = () => {
 
 
   // Effect to fetch the list of 3 trends
+  // Effect to fetch the list of trends from API
   useEffect(() => {
     const fetchTrends = async () => {
       setIsListLoading(true);
       setListError(null);
 
-      const CACHE_KEY = 'novus_global_trends';
-      const CACHE_DURATION = 12 * 60 * 60 * 1000; // 12 hours
       try {
-        const cachedData = localStorage.getItem(CACHE_KEY);
-        if (cachedData) {
-          const { timestamp, data } = JSON.parse(cachedData);
-          if (Date.now() - timestamp < CACHE_DURATION) {
-            setTrends(data);
-            setIsListLoading(false);
-            return;
-          }
-        }
-      } catch (e) { console.error("Error reading from cache", e); }
+        const response = await fetch('/api/trending');
+        if (!response.ok) throw new Error('Failed to fetch trending topics');
 
-      try {
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-        const prompt = `Act as a geopolitical and economic analyst. Identify the three most pressing global trending topics right now. For each topic, provide a concise, one-paragraph summary explaining its significance. Focus on topics related to international relations, supply chains, economic shifts, or major policy changes. IMPORTANT: Your entire response must be ONLY the raw JSON object that conforms to the provided schema. Do not include any introductory text, comments, or markdown formatting like \`\`\`json.`;
-        
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: trendsSchema,
-            }
-        });
+        const data = await response.json();
+        const mappedTrends = data.trending.map((t: any) => ({
+          ...t,
+          topic: t.title, // Map title to topic for compatibility
+          summary: t.summary,
+          details: t.details
+        }));
 
-        const parsedResult = JSON.parse(response.text.trim());
-
-        if (parsedResult.trends && parsedResult.trends.length > 0) {
-            setTrends(parsedResult.trends.slice(0,3));
-            localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data: parsedResult.trends.slice(0,3) }));
-        } else {
-            throw new Error("Invalid response format from AI.");
-        }
+        setTrends(mappedTrends);
       } catch (err: any) {
         console.error("Failed to fetch trending topics:", err);
-        let finalErrorMessage = "Could not load trending topics. Please try again later.";
-        if (err.message) {
-             finalErrorMessage = `Error: ${err.message}`;
-        }
-        setListError(finalErrorMessage);
+        setListError("Could not load trending topics. Please try again later.");
       } finally {
         setIsListLoading(false);
       }
@@ -136,42 +96,14 @@ const GlobalTrending: React.FC<GlobalTrendingProps> = () => {
   }, []);
 
   // Effect to fetch the full article when a trend is selected
+  // Effect to fetch the full article when a trend is selected
+  // Used pre-fetched details from the API instead of generating new one client-side
   useEffect(() => {
-    const fetchTrendingArticle = async () => {
-        if (!selectedTrend) return;
-
-        setIsArticleLoading(true);
-        setTrendingArticle(null);
-        setArticleError(null);
-
-        try {
-            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-            const prompt = `You are a world-class investigative journalist for 'Novus Exchange'. Your writing style is clear, insightful, and engaging. Based on the following topic and summary, write a full, in-depth news article of at least 5 paragraphs. The article must be well-structured with a compelling introduction, a detailed body, and a strong conclusion.
-            
-            IMPORTANT FORMATTING RULES:
-            - Do NOT use any markdown (e.g., no '##', '**', '*', '-', or numbered lists).
-            - Format the output as clean, plain text.
-            - Separate each paragraph with a single newline character ('\\n').
-            
-            TOPIC: "${selectedTrend.topic}"
-            
-            SUMMARY: "${selectedTrend.summary}"`;
-
-            const response = await ai.models.generateContent({
-                model: 'gemini-2.5-flash',
-                contents: prompt,
-            });
-
-            setTrendingArticle(response.text.trim());
-        } catch (error: any) {
-            console.error("Failed to generate trending article:", error);
-            setArticleError(`We are sorry, but there was an error generating the full analysis: ${error.message}`);
-        } finally {
-            setIsArticleLoading(false);
-        }
-    };
-
-    fetchTrendingArticle();
+    if (selectedTrend) {
+      // Use the details provided by the API directly
+      setTrendingArticle(selectedTrend.details || "No further details available.");
+      setIsArticleLoading(false);
+    }
   }, [selectedTrend]);
 
   const handleSelectTrend = (trend: Trend) => {
@@ -183,7 +115,7 @@ const GlobalTrending: React.FC<GlobalTrendingProps> = () => {
     setTrendingArticle(null);
     setArticleError(null);
   };
-  
+
   const renderArticleContent = () => {
     if (!trendingArticle) return null;
     return renderMarkdown(trendingArticle);
@@ -192,31 +124,31 @@ const GlobalTrending: React.FC<GlobalTrendingProps> = () => {
 
   if (selectedTrend) {
     return (
-        <div className="w-full max-w-7xl mx-auto page-transition-wrapper">
-            {isArticleLoading ? (
-                <ArticleSkeletonLoader />
-            ) : (
-            <div className="max-w-4xl mx-auto">
-                <button onClick={handleBackToTrends} className="mb-8 text-sm font-semibold text-white hover:underline flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    Back to Trends
-                </button>
-                <article>
-                    <span className="text-cyan-400 uppercase tracking-wider text-sm font-semibold">AI-Generated Analysis</span>
-                    <h1 className="text-4xl md:text-5xl font-bold text-white mt-2 mb-8 pb-8 border-b border-white/20">{selectedTrend.topic}</h1>
-                    {articleError ? (
-                         <p className="text-red-400">{articleError}</p>
-                    ) : (
-                        <div className="prose prose-lg prose-invert max-w-none text-gray-200">
-                            {renderArticleContent()}
-                        </div>
-                    )}
-                </article>
-            </div>
-            )}
-        </div>
+      <div className="w-full max-w-7xl mx-auto page-transition-wrapper">
+        {isArticleLoading ? (
+          <ArticleSkeletonLoader />
+        ) : (
+          <div className="max-w-4xl mx-auto">
+            <button onClick={handleBackToTrends} className="mb-8 text-sm font-semibold text-white hover:underline flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to Trends
+            </button>
+            <article>
+              <span className="text-cyan-400 uppercase tracking-wider text-sm font-semibold">AI-Generated Analysis</span>
+              <h1 className="text-4xl md:text-5xl font-bold text-white mt-2 mb-8 pb-8 border-b border-white/20">{selectedTrend.topic}</h1>
+              {articleError ? (
+                <p className="text-red-400">{articleError}</p>
+              ) : (
+                <div className="prose prose-lg prose-invert max-w-none text-gray-200">
+                  {renderArticleContent()}
+                </div>
+              )}
+            </article>
+          </div>
+        )}
+      </div>
     );
   }
 

@@ -13,6 +13,22 @@ export default function NoveeAssistant() {
   const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef(null);
   const [error, setError] = useState(null);
+  const [voices, setVoices] = useState([]);
+
+  // Load voices
+  useEffect(() => {
+    const updateVoices = () => {
+      const availableVoices = window.speechSynthesis.getVoices();
+      console.log('Voices loaded:', availableVoices.length);
+      setVoices(availableVoices);
+    };
+
+    // Chrome loads voices asynchronously
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      updateVoices();
+      window.speechSynthesis.onvoiceschanged = updateVoices;
+    }
+  }, []);
 
   // Auto-scroll to bottom of chat
   useEffect(() => {
@@ -25,7 +41,10 @@ export default function NoveeAssistant() {
   const handleMouseEnter = () => {
     setIsHovered(true);
     if (videoRef.current) {
-      videoRef.current.play().catch(e => console.log('Video play failed:', e));
+      // Unmuted playback requires user interaction in most browsers.
+      // If hover doesn't work, click handles it.
+      videoRef.current.currentTime = 0;
+      videoRef.current.play().catch(e => console.log('Video play failed (needs interaction?):', e));
     }
   };
 
@@ -90,10 +109,21 @@ export default function NoveeAssistant() {
     synth.cancel();
 
     const utter = new SpeechSynthesisUtterance(text);
-    // ... simplified voice selection ...
-    const voices = synth.getVoices();
-    const bestVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Neural') || v.name.includes('Samantha'))) || voices[0];
-    if (bestVoice) utter.voice = bestVoice;
+
+    // Improved voice selection using the loaded voices state
+    // Prioritize high-quality/natural voices
+    const preferredVoices = voices.filter(v => v.lang.startsWith('en'));
+    const bestVoice = preferredVoices.find(v => v.name.includes('Google US English')) ||
+      preferredVoices.find(v => v.name.includes('Google')) ||
+      preferredVoices.find(v => v.name.includes('Natural')) ||
+      preferredVoices[0] ||
+      voices[0];
+
+    if (bestVoice) {
+      console.log('Speaking with voice:', bestVoice.name);
+      utter.voice = bestVoice;
+    }
+
     synth.speak(utter);
   }
 
@@ -143,8 +173,6 @@ export default function NoveeAssistant() {
           ref={videoRef}
           src="/novee-wave.mp4"
           className={`absolute inset-0 z-20 w-full h-full object-cover rounded-full transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
-          muted
-          loop
           playsInline
         />
       </div>

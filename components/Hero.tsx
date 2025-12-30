@@ -1,19 +1,35 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 const Hero: React.FC = () => {
 
   return (
     <div id="home" className="min-h-screen flex flex-col items-center justify-center text-center relative px-4 pt-20">
-      <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg animate-fade-in-up">
+      <motion.h1
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg"
+      >
         CUT THROUGH THE NOISE
         <br />
         STAY INFORMED
-      </h1>
-      <p className="text-lg md:text-xl text-gray-200 mb-12 max-w-2xl mx-auto drop-shadow-md animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+      </motion.h1>
+      <motion.p
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+        className="text-lg md:text-xl text-gray-200 mb-12 max-w-2xl mx-auto drop-shadow-md"
+      >
         Critical, clear-eyed commentary on the issues shaping our world.
-      </p>
+      </motion.p>
 
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+        className="flex flex-col sm:flex-row items-center justify-center gap-4"
+      >
         <a
           href="#articles"
           className="inline-block bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-md transition-all duration-300 shadow-lg hover:shadow-red-500/30 hover:-translate-y-1 uppercase tracking-wider w-full sm:w-auto"
@@ -31,7 +47,7 @@ const Hero: React.FC = () => {
           </svg>
           Watch on YouTube
         </a>
-      </div>
+      </motion.div>
     </div>
   );
 };

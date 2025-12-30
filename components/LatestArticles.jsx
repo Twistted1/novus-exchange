@@ -1,7 +1,10 @@
 /* eslint-disable react/no-unescaped-entities */
+"use client"; // Added this to ensure it runs on the client side
+
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore'
+import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore'
+// Make sure this path matches your actual firebase configuration file
 import { db } from '../src/components/lib/firebase'
 
 const fallbackArticles = [
@@ -41,12 +44,29 @@ const fallbackArticles = [
 ];
 
 function ArticleCard({ article, onClick }) {
+  // Matching your 16:9 1920x1080 preference
   const fallbackImage = 'https://placehold.co/1920x1080/1a1a1a/ffffff?text=Novus+Exchange'
   const [imgSrc, setImgSrc] = useState(article.image || fallbackImage)
+
   return (
-    <div className="bg-white/5 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/10 cursor-pointer group flex flex-col aspect-video neon-card shine-hover" onClick={onClick} role="button" tabIndex="0" aria-label={`Read article: ${article.title}`} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onClick(e)}>
+    <div
+      className="bg-white/5 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/10 cursor-pointer group flex flex-col aspect-video neon-card shine-hover"
+      onClick={onClick}
+      role="button"
+      tabIndex="0"
+      aria-label={`Read article: ${article.title}`}
+      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onClick(e)}
+    >
       <div className="relative overflow-hidden h-1/2 w-full">
-        <Image fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover transition-transform duration-700 group-hover:scale-110" src={imgSrc} alt={article.title} unoptimized onError={() => setImgSrc(fallbackImage)} />
+        <Image
+          fill
+          sizes="(min-width: 768px) 33vw, 100vw"
+          className="object-cover transition-transform duration-700 group-hover:scale-110"
+          src={imgSrc}
+          alt={article.title}
+          unoptimized
+          onError={() => setImgSrc(fallbackImage)}
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500"></div>
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-blue-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
       </div>
@@ -55,8 +75,8 @@ function ArticleCard({ article, onClick }) {
         <h3 className="text-xl font-bold mb-3 leading-snug text-white transition-colors drop-shadow-sm neon-text">{article.title}</h3>
         <p className="text-gray-400 text-sm leading-relaxed line-clamp-3 mb-4 font-light">{article.summary}</p>
         <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between text-xs text-gray-500">
-          <span className="font-medium">By {article.author || 'Marcio R.'}</span>
-          <span>{article.readTime || '5 min read'}</span>
+          <span className="font-medium">By {article.author}</span>
+          <span>{article.readTime}</span>
         </div>
       </div>
     </div>
@@ -151,26 +171,32 @@ export default function LatestArticles({ searchQuery }) {
     async function fetchArticles() {
       try {
         setIsLoading(true);
-        // Query 'posts' collection for Published articles from CMS
+        // CHANGED: We now listen to the clean 'publishedArticles' collection
+        // This collection is managed by the Azure Function, so it only contains valid, published data.
         const q = query(
-          collection(db, 'posts'),
-          where('status', '==', 'Published'),
-          orderBy('createdAt', 'desc'),
+          collection(db, 'publishedArticles'),
+          orderBy('publishedAt', 'desc'),
           limit(9)
         );
         const querySnapshot = await getDocs(q);
 
         let fetchedArticles = querySnapshot.docs.map(doc => {
           const data = doc.data();
+
+          // Timestamp handling
+          const dateObj = data.publishedAt?.toDate ? data.publishedAt.toDate() : new Date();
+
           return {
             id: doc.id,
             title: data.title || 'Untitled',
-            summary: data.content ? data.content.substring(0, 150).replace(/<[^>]*>?/gm, '') + '...' : 'No summary available.',
-            fullText: data.content || '', // HTML content for Modal
-            image: data.imageUrl || 'https://placehold.co/1920x1080/1a1a1a/ffffff?text=Novus+Exchange',
-            category: data.platform || 'General',
-            author: 'Marcio Novus', // Can map data.userId if available
-            date: data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString() : 'Recently',
+            // Clean up the body text for the summary
+            summary: data.body ? data.body.substring(0, 150).replace(/<[^>]*>?/gm, '') + '...' : 'No summary available.',
+            fullText: data.body || '',
+            // Map the correct image field from Copilot's schema
+            image: data.mainImage || 'https://placehold.co/1920x1080/1a1a1a/ffffff?text=Novus+Exchange',
+            category: data.category || 'Intelligence',
+            author: 'Novus Analyst',
+            date: dateObj.toLocaleDateString(),
             readTime: '5 min read'
           };
         });
@@ -188,7 +214,6 @@ export default function LatestArticles({ searchQuery }) {
     }
     fetchArticles()
   }, [])
-
 
   useEffect(() => {
     const onKeyDown = (e) => { if (e.key === 'Escape') setSelectedArticleId(null) }
