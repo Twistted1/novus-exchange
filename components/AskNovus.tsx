@@ -111,17 +111,22 @@ const AskNovus: React.FC<AskNovusProps> = ({ onSearch }) => {
           },
         });
 
-        const base64ImageBytes: string = imageResponse.generatedImages[0].image.imageBytes;
-        const imageUrl = `data:image/jpeg;base64,${base64ImageBytes}`;
+        const generatedImage = imageResponse.generatedImages?.[0];
+        if (generatedImage && generatedImage.image && generatedImage.image.imageBytes) {
+          const base64ImageBytes: string = generatedImage.image.imageBytes;
+          const imageUrl = `data:image/jpeg;base64,${base64ImageBytes}`;
 
-        modelResponse = {
-          id: Date.now() + 2,
-          source: 'model',
-          text: `Here is the image you requested for: "${imageGenPrompt}"`,
-          imageUrl: imageUrl,
-        };
+          modelResponse = {
+            id: Date.now() + 2,
+            source: 'model',
+            text: `Here is the image you requested for: "${imageGenPrompt}"`,
+            imageUrl: imageUrl,
+          };
+        } else {
+          throw new Error("Failed to generate image.");
+        }
       } else {
-        const parts = [];
+        const parts: any[] = [];
         if (selectedImage) {
           const imagePart = await fileToGenerativePart(selectedImage);
           parts.push(imagePart);
@@ -138,7 +143,7 @@ const AskNovus: React.FC<AskNovusProps> = ({ onSearch }) => {
         modelResponse = {
           id: Date.now() + 2,
           source: 'model',
-          text: response.text,
+          text: response.text || "No response generated.",
         };
       }
       setMessages(prev => [...prev.slice(0, -1), modelResponse]);
