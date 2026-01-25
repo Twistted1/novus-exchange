@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import AskNovus from "../../components/AskNovus";
+// import AskNovus from "../../components/AskNovus";
 
 export default function AskNovusPage() {
   return (

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import GlassCard from './GlassCard';
 import { NovusMessage } from '../types';
-import { renderMarkdown } from '../utils';
+import { renderMarkdown } from '../markdownUtils';
 
 interface ChatbotProps {
     isOpen: boolean;
@@ -33,15 +33,14 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, setIsOpen, messages, onSendMe
         <>
             {/* Chat Window */}
             <div
-                className={`fixed bottom-28 right-4 sm:right-6 w-[calc(100vw-2rem)] max-w-sm h-[60vh] max-h-[500px] z-40 transition-all duration-300 ease-in-out ${
-                isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'
-                }`}
+                className={`fixed bottom-28 right-4 sm:right-6 w-[calc(100vw-2rem)] max-w-sm h-[60vh] max-h-[500px] z-40 transition-all duration-300 ease-in-out ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'
+                    }`}
             >
                 <GlassCard className="h-full flex flex-col p-0 overflow-hidden !border-cyan-400/60 !shadow-cyan-400/40">
                     {/* Header */}
                     <div className="flex items-center justify-between p-3 border-b border-white/10 shrink-0 bg-white/5">
                         <div className="flex items-center gap-2">
-                           <svg className="w-6 h-6 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                            <svg className="w-6 h-6 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
                             <h3 className="font-semibold text-white">Novus AI Assistant</h3>
                         </div>
                         <button
@@ -56,10 +55,10 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, setIsOpen, messages, onSendMe
                     {/* Body */}
                     <div ref={chatBodyRef} className="flex-grow p-4 overflow-y-auto space-y-4">
                         {messages.map((msg) => (
-                             <div key={msg.id} className={`flex items-start gap-3 ${msg.source === 'user' ? 'justify-end' : ''}`}>
+                            <div key={msg.id} className={`flex items-start gap-3 ${msg.source === 'user' ? 'justify-end' : ''}`}>
                                 {msg.source === 'model' && (
                                     <div className="w-7 h-7 rounded-full bg-cyan-500/20 flex items-center justify-center shrink-0 border border-cyan-500/50">
-                                       <svg className="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                                        <svg className="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
                                     </div>
                                 )}
                                 <div className={`p-3 rounded-xl max-w-xs sm:max-w-sm ${msg.source === 'user' ? 'bg-purple-500/30' : 'bg-black/20'}`}>

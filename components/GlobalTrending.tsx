@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import GlassCard from './GlassCard';
 import { Trend } from '../types';
-import { renderMarkdown } from '../utils';
+import { renderMarkdown } from '../markdownUtils';
 
 // Removed client-side GoogleGenAI import to prevent exposure/errors
 
@@ -124,7 +124,7 @@ const GlobalTrending: React.FC<GlobalTrendingProps> = () => {
 
   if (selectedTrend) {
     return (
-      <div className="w-full max-w-7xl mx-auto page-transition-wrapper">
+      <section id="trending" className="w-full max-w-7xl mx-auto page-transition-wrapper py-32 scroll-mt-20">
         {isArticleLoading ? (
           <ArticleSkeletonLoader />
         ) : (
@@ -148,12 +148,12 @@ const GlobalTrending: React.FC<GlobalTrendingProps> = () => {
             </article>
           </div>
         )}
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto">
+    <section id="trending" className="w-full max-w-7xl mx-auto py-32 scroll-mt-20">
       <h2 className="text-4xl font-bold text-center text-white mb-4">Global Trending</h2>
       <p className="text-lg text-center text-gray-400 max-w-3xl mx-auto mb-10">
         AI-powered summaries of the most pressing geopolitical and economic topics, refreshed twice daily.
@@ -169,7 +169,7 @@ const GlobalTrending: React.FC<GlobalTrendingProps> = () => {
           ))
         )}
       </div>
-    </div>
+    </section>
   );
 };
 
