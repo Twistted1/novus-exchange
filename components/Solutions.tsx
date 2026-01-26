@@ -121,7 +121,8 @@ export default function Solutions() {
                                 rotate: [0, 0.5, 0, -0.5, 0]
                             }}
                             transition={{
-                                initial: { duration: 0.5, delay: index * 0.1 },
+                                duration: 0.5,
+                                delay: index * 0.1,
                                 y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: index * 0.5 },
                                 rotate: { duration: 8, repeat: Infinity, ease: "easeInOut", delay: index * 0.3 }
                             }}

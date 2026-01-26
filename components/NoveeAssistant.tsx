@@ -1,19 +1,33 @@
 "use client";
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+interface Message {
+  id: number;
+  sender: 'ai' | 'user';
+  text: string;
+}
+
+// Extend Window interface for SpeechRecognition
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
 
 export default function NoveeAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const videoRef = useRef(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // Chat state from SiteChatbot
-  const [messages, setMessages] = useState([{ id: 1, sender: 'ai', text: "Hey I'm Novee, What's up? I'm here to dive deep into any research topic or site features with you!" }]);
+  const [messages, setMessages] = useState<Message[]>([{ id: 1, sender: 'ai', text: "Hey I'm Novee, What's up? I'm here to dive deep into any research topic or site features with you!" }]);
   const [input, setInput] = useState('');
   const [isListening, setIsListening] = useState(false);
-  const messagesEndRef = useRef(null);
-  const [error, setError] = useState(null);
-  const [voices, setVoices] = useState([]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
 
   // Load voices
   useEffect(() => {
@@ -41,8 +55,6 @@ export default function NoveeAssistant() {
   const handleMouseEnter = () => {
     setIsHovered(true);
     if (videoRef.current) {
-      // Unmuted playback requires user interaction in most browsers.
-      // If hover doesn't work, click handles it.
       videoRef.current.currentTime = 0;
       videoRef.current.play().catch(e => console.log('Video play failed (needs interaction?):', e));
     }
@@ -69,11 +81,11 @@ export default function NoveeAssistant() {
     recognition.maxAlternatives = 1;
     recognition.onstart = () => setIsListening(true);
     recognition.onend = () => setIsListening(false);
-    recognition.onresult = (event) => {
+    recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript;
       setInput(transcript);
     };
-    recognition.onerror = (event) => {
+    recognition.onerror = (event: any) => {
       console.error(event.error);
       setError('Voice input failed. Please try again.');
       setIsListening(false);
@@ -81,7 +93,7 @@ export default function NoveeAssistant() {
     recognition.start();
   };
 
-  async function handleSend(e) {
+  async function handleSend(e: FormEvent) {
     e.preventDefault();
     if (!input.trim()) return;
     const userText = input;
@@ -102,16 +114,13 @@ export default function NoveeAssistant() {
     }
   }
 
-  function speakText(text) {
+  function speakText(text: string) {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
     const synth = window.speechSynthesis;
-    // Don't auto-cancel if already speaking? Maybe better to cancel to speak new text.
     synth.cancel();
 
     const utter = new SpeechSynthesisUtterance(text);
 
-    // Improved voice selection using the loaded voices state
-    // Prioritize high-quality/natural voices
     const preferredVoices = voices.filter(v => v.lang.startsWith('en'));
     const bestVoice = preferredVoices.find(v => v.name.includes('Google US English')) ||
       preferredVoices.find(v => v.name.includes('Google')) ||
