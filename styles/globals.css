@@ -167,7 +167,7 @@ html {
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.6);
 }
 
-/* This sets the default dark background and font for your site */
+/* Base site settings */
 html {
   scroll-behavior: smooth;
 }
@@ -175,7 +175,7 @@ html {
 body {
   background-color: #000000;
   color: #ffffff;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', 'Outfit', sans-serif;
 }
 
 .noise-overlay {
@@ -184,28 +184,44 @@ body {
   background-size: 600px 600px;
 }
 
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-
-  100% {
-    transform: translateX(100%);
-  }
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
 }
-/* Force Rebuild 2 */
-/* Force Rebuild 3 */
-/* Force Rebuild 4 */
-/* Force Rebuild 5 */
-/* Force Rebuild 6 */
-/* Force Rebuild 7 */
-/* Force Rebuild 8 */
-/* Force Rebuild 9 */
-/* Force Rebuild 10 */
-/* Force Rebuild 11 */
-/* Force Rebuild 12 */
-/* Force Rebuild 13 */
-/* Force Rebuild 14 */
-/* Force Rebuild 15 */
-/* Force Rebuild 16 */
-/* Force Rebuild 17 */
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 7s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.animate-float-slow {
+  animation: float 9s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+.glow-shadow-red {
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.15), 0 0 40px rgba(220, 38, 38, 0.1);
+}
+
+.glow-shadow-cyan {
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.15), 0 0 40px rgba(34, 211, 238, 0.1);
+}
+
+.glow-shadow-purple {
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.15), 0 0 40px rgba(168, 85, 247, 0.1);
+}
+
+.glow-shadow-emerald {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.15), 0 0 40px rgba(16, 185, 129, 0.1);
+}
+
+.glow-shadow-blue {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.15), 0 0 40px rgba(59, 130, 246, 0.1);
+}
+
+/* Force Rebuild 18 */

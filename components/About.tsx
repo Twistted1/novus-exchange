@@ -20,10 +20,10 @@ const About: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-5xl font-black text-white mb-6 uppercase tracking-tight">
+          <h2 className="text-2xl md:text-3xl font-black text-white mb-4 uppercase tracking-tight">
             Our <span className="text-red-600">Mission</span>
           </h2>
-          <p className="text-lg text-gray-400 max-w-3xl mx-auto font-light leading-relaxed">
+          <p className="text-base text-gray-400 max-w-2xl mx-auto font-light leading-relaxed">
             People deserve more than just headlines. Novus Exchange was founded to provide the full story, challenging conventional narratives and exposing the complexities of pressing issues.
           </p>
         </motion.div>
@@ -37,8 +37,8 @@ const About: React.FC = () => {
           <GlassCard className="max-w-6xl mx-auto overflow-hidden bg-black/40 backdrop-blur-2xl border-white/10 group">
             <div className="grid lg:grid-cols-5 gap-0 items-stretch">
               <div className="lg:col-span-2 p-8 md:p-12 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-white/10">
-                <div className="w-12 h-1 bg-red-600 mb-8" />
-                <h3 className="text-3xl font-bold text-white mb-6 tracking-tight">Novus Exchange</h3>
+                <div className="w-12 h-1 bg-red-600 mb-6" />
+                <h3 className="text-xl font-bold text-white mb-4 tracking-tight">Novus Exchange</h3>
                 <div className="space-y-6">
                   <p className="text-gray-300 leading-relaxed font-light">
                     Our mission is to inform, provoke thought, and foster discussion by shining a light on the injustices and abuses of power impacting individuals and society.

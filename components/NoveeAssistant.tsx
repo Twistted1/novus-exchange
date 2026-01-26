@@ -8,7 +8,7 @@ export default function NoveeAssistant() {
   const videoRef = useRef(null);
 
   // Chat state from SiteChatbot
-  const [messages, setMessages] = useState([{ id: 1, sender: 'ai', text: 'Hi! I am Novee, your research assistant. How can I help?' }]);
+  const [messages, setMessages] = useState([{ id: 1, sender: 'ai', text: "Hey I'm Novee, What's up? I'm here to dive deep into any research topic or site features with you!" }]);
   const [input, setInput] = useState('');
   const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef(null);
@@ -145,7 +145,7 @@ export default function NoveeAssistant() {
             exit={{ opacity: 0, y: 10 }}
             className="mb-3 mr-4 bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-xl shadow-xl border border-white/20"
           >
-            <p className="text-sm font-bold">Hi! I&apos;m Novee! 👋</p>
+            <p className="text-sm font-bold">Hey! I&apos;m Novee, What&apos;s up? 🤖</p>
           </motion.div>
         )}
       </AnimatePresence>

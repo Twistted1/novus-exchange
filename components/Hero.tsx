@@ -6,12 +6,12 @@ const Hero: React.FC<{ onNavClick: (page: string) => void }> = ({ onNavClick }) 
 
   return (
     <section id="home" className="min-h-screen flex flex-col items-center justify-center text-center relative px-4 pt-20">
-      <h1 className="text-4xl md:text-6xl font-black text-white mb-4 drop-shadow-lg animate-fade-in-up uppercase tracking-tight">
+      <h1 className="text-2xl md:text-4xl font-black text-white mb-4 drop-shadow-lg animate-fade-in-up uppercase tracking-tight">
         CUT THROUGH THE NOISE
         <br />
         STAY INFORMED
       </h1>
-      <p className="text-lg md:text-xl text-gray-200 mb-12 max-w-2xl mx-auto drop-shadow-md animate-fade-in-up font-light" style={{ animationDelay: '0.2s' }}>
+      <p className="text-base md:text-lg text-gray-200 mb-12 max-w-2xl mx-auto drop-shadow-md animate-fade-in-up font-light" style={{ animationDelay: '0.2s' }}>
         Critical, clear-eyed commentary on the issues shaping our world.
       </p>
 
