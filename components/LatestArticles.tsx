@@ -7,7 +7,19 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore'
 import { db } from '../src/components/lib/firebase'
 
-const fallbackArticles = [
+interface Article {
+  id: string;
+  title: string;
+  summary: string;
+  fullText: string;
+  image: string;
+  category: string;
+  author: string;
+  date: string;
+  readTime: string;
+}
+
+const fallbackArticles: Article[] = [
   {
     id: 'placeholder-1',
     title: 'The Future of AI in Global Finance',
@@ -15,7 +27,7 @@ const fallbackArticles = [
     fullText: '<p>Artificial Intelligence is revolutionary...</p>',
     image: 'https://placehold.co/1920x1080/1a1a1a/ffffff?text=AI+Finance',
     category: 'Technology',
-    author: 'Novus AI',
+    author: 'Marcio Rodrigues',
     date: new Date().toLocaleDateString(),
     readTime: '5 min read'
   },
@@ -26,7 +38,7 @@ const fallbackArticles = [
     fullText: '<p>The markets are shifting...</p>',
     image: 'https://placehold.co/1920x1080/1a1a1a/ffffff?text=Market+Outlook',
     category: 'Economy',
-    author: 'Novus Analyst',
+    author: 'Marcio Rodrigues',
     date: new Date().toLocaleDateString(),
     readTime: '7 min read'
   },
@@ -37,13 +49,13 @@ const fallbackArticles = [
     fullText: '<p>Renewable energy is not just...</p>',
     image: 'https://placehold.co/1920x1080/1a1a1a/ffffff?text=Clean+Energy',
     category: 'Energy',
-    author: 'Eco Tech',
+    author: 'Marcio Rodrigues',
     date: new Date().toLocaleDateString(),
     readTime: '6 min read'
   }
 ];
 
-function ArticleCard({ article, index, onClick }) {
+function ArticleCard({ article, index, onClick }: { article: Article, index: number, onClick: () => void }) {
   const fallbackImage = 'https://placehold.co/1920x1080/1a1a1a/ffffff?text=Novus+Exchange'
   const [imgSrc, setImgSrc] = useState(article.image || fallbackImage)
 
@@ -52,12 +64,13 @@ function ArticleCard({ article, index, onClick }) {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ delay: index * 0.1 }}
       animate={{
         y: [0, -3, 0],
       }}
       transition={{
-        y: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: index * 0.4 },
+        duration: 0.5,
+        delay: index * 0.1,
+        y: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: index * 0.4 }
       }}
       className="group relative bg-[#0a0a0a] rounded-[1.5rem] overflow-hidden border border-white/5 cursor-pointer flex flex-col transition-all duration-500 hover:border-red-600/30 hover:glow-shadow-red shadow-xl"
       onClick={onClick}
@@ -93,7 +106,7 @@ function ArticleCard({ article, index, onClick }) {
   )
 }
 
-function ArticleModal({ article, onClose }) {
+function ArticleModal({ article, onClose }: { article: Article, onClose: () => void }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -128,8 +141,12 @@ function ArticleModal({ article, onClose }) {
               className="prose prose-invert prose-sm md:prose-base max-w-none text-gray-300 leading-relaxed font-light"
               dangerouslySetInnerHTML={{ __html: article.fullText }}
             />
-            <div className="mt-12 pt-8 border-t border-white/5 flex items-center justify-between">
-              <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Published: {article.date}</span>
+            <div className="mt-12 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row items-center gap-4 text-[10px] font-mono uppercase tracking-widest">
+                <span className="text-gray-500">Published: {article.date}</span>
+                <span className="hidden sm:inline text-white/20">|</span>
+                <span className="text-white font-bold">Author: {article.author}</span>
+              </div>
               <button onClick={onClose} className="text-xs font-bold uppercase tracking-widest text-red-600 hover:text-white transition-colors">Close</button>
             </div>
           </div>
@@ -139,9 +156,9 @@ function ArticleModal({ article, onClose }) {
   )
 }
 
-export default function LatestArticles({ searchQuery }) {
-  const [articles, setArticles] = useState([])
-  const [selectedArticleId, setSelectedArticleId] = useState(null)
+export default function LatestArticles({ searchQuery }: { searchQuery: string }) {
+  const [articles, setArticles] = useState<Article[]>([])
+  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -150,7 +167,7 @@ export default function LatestArticles({ searchQuery }) {
         setIsLoading(true);
         const q = query(collection(db, 'publishedArticles'), orderBy('publishedAt', 'desc'), limit(6));
         const querySnapshot = await getDocs(q);
-        let fetchedArticles = querySnapshot.docs.map(doc => {
+        let fetchedArticles: Article[] = querySnapshot.docs.map(doc => {
           const data = doc.data();
           const dateObj = data.publishedAt?.toDate ? data.publishedAt.toDate() : new Date();
           return {
@@ -204,7 +221,7 @@ export default function LatestArticles({ searchQuery }) {
 
       <AnimatePresence>
         {!!selectedArticleId && (
-          <ArticleModal article={articles.find(a => a.id === selectedArticleId)} onClose={() => setSelectedArticleId(null)} />
+          <ArticleModal article={articles.find(a => a.id === selectedArticleId)!} onClose={() => setSelectedArticleId(null)} />
         )}
       </AnimatePresence>
     </section>

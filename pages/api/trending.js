@@ -7,7 +7,8 @@ export default async function handler(req, res) {
   }
 
   // Cache for 24 hours
-  res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=43200');
+  // Cache for 6 hours, with stale-while-revalidate for 3 hours
+  res.setHeader('Cache-Control', 'public, s-maxage=21600, stale-while-revalidate=10800');
 
   // Fallback static data in case AI fails
   const fallbackData = [
@@ -18,9 +19,9 @@ export default async function handler(req, res) {
 
   try {
     const provider = process.env.AI_PROVIDER
-    const prompt = `Generate 3 completely fictional but realistic "Global Trending" news headlines for today. 
-    Format as a valid JSON array of objects with keys: "id" (number), "title" (string), "summary" (short string), "details" (longer paragraph), "image" (use a placeholder URL like https://placehold.co/1080x1080/222/fff?text=Topic).
-    Do NOT use Markdown. Return ONLY the JSON string.`
+    const prompt = `Act as a top-tier intelligence analyst. Generate 3 "Global Trending" intelligence briefings based on real-world events from the last 24-48 hours (geopolitics, economy, technology). 
+    Format as a valid JSON array of objects with keys: "id" (number), "title" (string), "summary" (high-level overview, 1-2 sentences), "details" (deep analysis in markdown format, 3-4 paragraphs), "image" (use a placeholder URL like https://placehold.co/1080x1080/1a1a1a/fff?text=TOPIC_NAME).
+    Ensure the content is serious, analytical, and professional. Do NOT use Markdown code blocks around the JSON. Return ONLY the raw JSON string.`
 
     let jsonText = ''
 

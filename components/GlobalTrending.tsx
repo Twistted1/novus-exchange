@@ -97,9 +97,17 @@ const GlobalTrending: React.FC = () => {
                 <motion.div className="text-red-600 font-mono text-[9px] font-black uppercase tracking-[0.5em] mb-4">Live Intelligence</motion.div>
                 <h2 className="text-2xl md:text-3xl font-black text-white mb-4 tracking-tighter uppercase">Global <span className="text-red-600">Trending</span></h2>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                 {isListLoading ? Array.from({ length: 3 }).map((_, i) => <div key={i} className="aspect-square bg-white/5 animate-pulse rounded-2xl" />) :
                   trends?.map((trend, index) => <TrendCard key={index} trend={trend} index={index} onSelect={() => setSelectedTrend(trend)} />)}
+              </div>
+              <div className="flex justify-start border-t border-white/5 pt-8">
+                <div className="flex items-center gap-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
+                  <span className="text-[10px] font-mono text-gray-500 uppercase tracking-[0.4em]">
+                    Intelligence by Novus AI • <span className="text-gray-400">AI Powered News</span>
+                  </span>
+                </div>
               </div>
             </motion.div>
           )}
