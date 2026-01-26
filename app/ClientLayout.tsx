@@ -1,8 +1,8 @@
 "use client";
 
-import Header from '../components/Header'
-import Footer from '../components/Footer'
-import NoveeAssistant from '../components/NoveeAssistant'
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+import NoveeAssistant from '../components/NoveeAssistant';
 
 export default function ClientLayout({
   children,
@@ -16,5 +16,5 @@ export default function ClientLayout({
       <Footer />
       <NoveeAssistant />
     </>
-  )
+  );
 }

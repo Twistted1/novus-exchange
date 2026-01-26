@@ -1,22 +1,11 @@
 "use client";
+
 import React, { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-
-// Fallback if types are missing
-enum Page {
-  Home = 'home',
-  About = 'about',
-  Articles = 'articles',
-  Trending = 'trending',
-  Solutions = 'solutions',
-
-  Contact = 'contact'
-}
 
 interface NavLinkProps {
   page: string;
   activePage?: string;
-  onNavClick?: (page: any) => void;
+  onNavClick?: (page: string) => void;
   children: React.ReactNode;
   className?: string;
 }
@@ -24,12 +13,11 @@ interface NavLinkProps {
 const NavLink: React.FC<NavLinkProps> = ({ page, activePage, onNavClick, children, className }) => {
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    const targetId = page;
-    const element = document.getElementById(targetId);
+    const element = document.getElementById(page);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     } else {
-      window.location.href = href;
+      window.location.href = `/#${page}`;
     }
     if (onNavClick) {
       onNavClick(page);
@@ -40,18 +28,21 @@ const NavLink: React.FC<NavLinkProps> = ({ page, activePage, onNavClick, childre
   const baseClasses = "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200";
   const activeClasses = "bg-white/10 text-white";
   const inactiveClasses = "text-gray-300 hover:text-white hover:bg-white/10";
-  const href = `/#${page}`;
 
   return (
-    <a href={href} onClick={handleClick} className={`${baseClasses} ${isActive ? activeClasses : inactiveClasses} ${className || ''}`}>
+    <a
+      href={`/#${page}`}
+      onClick={handleClick}
+      className={`${baseClasses} ${isActive ? activeClasses : inactiveClasses} ${className || ''}`}
+    >
       {children}
     </a>
   );
 };
 
 interface HeaderProps {
-  activePage?: any;
-  onNavClick?: (page: any) => void;
+  activePage?: string;
+  onNavClick?: (page: string) => void;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
 }
@@ -97,12 +88,21 @@ const Header: React.FC<HeaderProps> = ({ activePage, onNavClick, searchQuery = '
   return (
     <header
       ref={headerRef}
-      className={`glass-card fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled || isMenuOpen ? 'bg-black/80 backdrop-blur-lg' : 'bg-transparent'}`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled || isMenuOpen ? 'bg-black/80 backdrop-blur-lg' : 'bg-transparent'}`}
     >
       <div className="px-4 sm:px-6 md:px-8">
         <div className="flex items-center justify-between h-20">
           <div className="flex-shrink-0">
-            <a href="/#home" onClick={(e) => { e.preventDefault(); document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' }); handleNavClick('home'); }} className="flex items-center space-x-3" aria-label="Go to Novus Exchange homepage">
+            <a
+              href="/#home"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' });
+                handleNavClick('home');
+              }}
+              className="flex items-center space-x-3"
+              aria-label="Go to Novus Exchange homepage"
+            >
               {!logoError ? (
                 <img
                   src="/novus-logo.png"
@@ -158,23 +158,11 @@ const Header: React.FC<HeaderProps> = ({ activePage, onNavClick, searchQuery = '
       </div>
 
       {isMenuOpen && (
-        <div className="md:hidden">
+        <div className="md:hidden bg-black/95 backdrop-blur-xl border-t border-white/10">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 capitalize">
             {navItems.map(page => (
-              <NavLink key={page} page={page} activePage={activePage} onNavClick={(p) => { handleNavClick(p); setIsMenuOpen(false); }} className="block w-full text-left">{page.replace('-', ' ')}</NavLink>
+              <NavLink key={page} page={page} activePage={activePage} onNavClick={(p) => { handleNavClick(p); setIsMenuOpen(false); }} className="block w-full">{page.replace('-', ' ')}</NavLink>
             ))}
-            <div className="relative px-3 pt-2">
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-                className="w-full bg-white/10 border-white/20 rounded-md py-1.5 pl-8 pr-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all duration-300"
-              />
-              <svg className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
           </div>
         </div>
       )}

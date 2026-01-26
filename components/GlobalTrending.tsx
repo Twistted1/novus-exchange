@@ -1,15 +1,9 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import GlassCard from './GlassCard';
 import { Trend } from '../types';
 import { renderMarkdown } from '../markdownUtils';
-
-// Removed client-side GoogleGenAI import to prevent exposure/errors
-
-interface GlobalTrendingProps {
-}
-
-// Schema removed as we are fetching from API
-
 
 const TrendCard: React.FC<{ trend: Trend, style?: React.CSSProperties, onSelect: () => void }> = ({ trend, style, onSelect }) => (
   <GlassCard className="flex flex-col p-6 aspect-square" style={style}>
@@ -53,36 +47,28 @@ const ArticleSkeletonLoader: React.FC = () => (
   </div>
 );
 
-const GlobalTrending: React.FC<GlobalTrendingProps> = () => {
+const GlobalTrending: React.FC = () => {
   const [trends, setTrends] = useState<Trend[] | null>(null);
   const [isListLoading, setIsListLoading] = useState<boolean>(true);
   const [listError, setListError] = useState<string | null>(null);
 
   const [selectedTrend, setSelectedTrend] = useState<Trend | null>(null);
   const [trendingArticle, setTrendingArticle] = useState<string | null>(null);
-  const [isArticleLoading, setIsArticleLoading] = useState<boolean>(false);
-  const [articleError, setArticleError] = useState<string | null>(null);
 
-
-  // Effect to fetch the list of 3 trends
-  // Effect to fetch the list of trends from API
   useEffect(() => {
     const fetchTrends = async () => {
       setIsListLoading(true);
       setListError(null);
-
       try {
         const response = await fetch('/api/trending');
         if (!response.ok) throw new Error('Failed to fetch trending topics');
-
         const data = await response.json();
         const mappedTrends = data.trending.map((t: any) => ({
           ...t,
-          topic: t.title, // Map title to topic for compatibility
+          topic: t.title,
           summary: t.summary,
           details: t.details
         }));
-
         setTrends(mappedTrends);
       } catch (err: any) {
         console.error("Failed to fetch trending topics:", err);
@@ -91,63 +77,33 @@ const GlobalTrending: React.FC<GlobalTrendingProps> = () => {
         setIsListLoading(false);
       }
     };
-
     fetchTrends();
   }, []);
 
-  // Effect to fetch the full article when a trend is selected
-  // Effect to fetch the full article when a trend is selected
-  // Used pre-fetched details from the API instead of generating new one client-side
   useEffect(() => {
     if (selectedTrend) {
-      // Use the details provided by the API directly
       setTrendingArticle(selectedTrend.details || "No further details available.");
-      setIsArticleLoading(false);
     }
   }, [selectedTrend]);
 
-  const handleSelectTrend = (trend: Trend) => {
-    setSelectedTrend(trend);
-  };
-
-  const handleBackToTrends = () => {
-    setSelectedTrend(null);
-    setTrendingArticle(null);
-    setArticleError(null);
-  };
-
-  const renderArticleContent = () => {
-    if (!trendingArticle) return null;
-    return renderMarkdown(trendingArticle);
-  };
-
-
   if (selectedTrend) {
     return (
-      <section id="trending" className="w-full max-w-7xl mx-auto page-transition-wrapper py-32 scroll-mt-20">
-        {isArticleLoading ? (
-          <ArticleSkeletonLoader />
-        ) : (
-          <div className="max-w-4xl mx-auto">
-            <button onClick={handleBackToTrends} className="mb-8 text-sm font-semibold text-white hover:underline flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              Back to Trends
-            </button>
-            <article>
-              <span className="text-cyan-400 uppercase tracking-wider text-sm font-semibold">AI-Generated Analysis</span>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mt-2 mb-8 pb-8 border-b border-white/20">{selectedTrend.topic}</h1>
-              {articleError ? (
-                <p className="text-red-400">{articleError}</p>
-              ) : (
-                <div className="prose prose-lg prose-invert max-w-none text-gray-200">
-                  {renderArticleContent()}
-                </div>
-              )}
-            </article>
-          </div>
-        )}
+      <section id="trending" className="w-full max-w-7xl mx-auto py-32 scroll-mt-20">
+        <div className="max-w-4xl mx-auto">
+          <button
+            onClick={() => { setSelectedTrend(null); setTrendingArticle(null); }}
+            className="mb-8 text-sm font-semibold text-white hover:underline flex items-center gap-2"
+          >
+            &larr; Back to Trends
+          </button>
+          <article>
+            <span className="text-cyan-400 uppercase tracking-wider text-sm font-semibold">AI-Generated Analysis</span>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mt-2 mb-8 pb-8 border-b border-white/20">{selectedTrend.topic}</h1>
+            <div className="prose prose-lg prose-invert max-w-none text-gray-200">
+              {trendingArticle && renderMarkdown(trendingArticle)}
+            </div>
+          </article>
+        </div>
       </section>
     );
   }
@@ -158,14 +114,14 @@ const GlobalTrending: React.FC<GlobalTrendingProps> = () => {
       <p className="text-lg text-center text-gray-400 max-w-3xl mx-auto mb-10">
         AI-powered summaries of the most pressing geopolitical and economic topics, refreshed twice daily.
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 stagger-fade-in-up">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
         {isListLoading ? (
-          Array.from({ length: 3 }).map((_, index) => <SkeletonCard key={index} style={{ transitionDelay: `${index * 100}ms` }} />)
+          Array.from({ length: 3 }).map((_, index) => <SkeletonCard key={index} />)
         ) : listError ? (
           <div className="col-span-full text-center py-10"><p className="text-red-400">{listError}</p></div>
         ) : (
           trends?.map((trend, index) => (
-            <TrendCard key={index} trend={trend} style={{ transitionDelay: `${index * 100}ms` }} onSelect={() => handleSelectTrend(trend)} />
+            <TrendCard key={index} trend={trend} onSelect={() => setSelectedTrend(trend)} />
           ))
         )}
       </div>

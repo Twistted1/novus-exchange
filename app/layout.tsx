@@ -23,9 +23,7 @@ export default function RootLayout({
       </head>
       <body className="bg-[#0a0a0a] text-white antialiased font-inter">
         <ClientLayout>
-          <main>
-            {children}
-          </main>
+          {children}
         </ClientLayout>
       </body>
     </html>
