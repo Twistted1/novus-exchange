@@ -1,4 +1,4 @@
-import { VertexAI } from '@google-cloud/vertexai'
+
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 export default async function handler(req, res) {
@@ -45,9 +45,9 @@ export default async function handler(req, res) {
     ]
 
     try {
-        const provider = process.env.AI_PROVIDER || 'vertex'
+        const provider = process.env.AI_PROVIDER || 'gemini'
         // If no keys, return fallback immediately
-        if (!process.env.VERTEX_PROJECT_ID && !process.env.GEMINI_API_KEY && !process.env.GOOGLE_API_KEY) {
+        if (!process.env.GEMINI_API_KEY && !process.env.GOOGLE_API_KEY) {
             return res.status(200).json({ articles: fallbackArticles })
         }
 
@@ -61,12 +61,7 @@ export default async function handler(req, res) {
 
         let jsonText = ''
 
-        if (process.env.VERTEX_PROJECT_ID && process.env.VERTEX_LOCATION) {
-            const vertex = new VertexAI({ project: process.env.VERTEX_PROJECT_ID, location: process.env.VERTEX_LOCATION })
-            const model = vertex.getGenerativeModel({ model: 'gemini-1.5-flash' })
-            const result = await model.generateContent(prompt)
-            jsonText = result.response.text()
-        } else if (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY) {
+        if (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY) {
             const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY)
             const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
             const result = await model.generateContent(prompt)
