@@ -65,12 +65,14 @@ function ArticleCard({ article, index, onClick }: { article: Article, index: num
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       animate={{
-        y: [0, -3, 0],
+        y: [0, -5, 0],
+        rotate: [0, 0.5, 0, -0.5, 0]
       }}
       transition={{
         duration: 0.5,
         delay: index * 0.1,
-        y: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: index * 0.4 }
+        y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: index * 0.5 },
+        rotate: { duration: 8, repeat: Infinity, ease: "easeInOut", delay: index * 0.3 }
       }}
       className="group relative bg-[#0a0a0a] rounded-[1.5rem] overflow-hidden border border-white/5 cursor-pointer flex flex-col transition-all duration-500 hover:border-red-600/30 hover:glow-shadow-red shadow-xl"
       onClick={onClick}
@@ -122,7 +124,7 @@ function ArticleModal({ article, onClose }: { article: Article, onClose: () => v
       >
         <div className="p-6 flex justify-between items-center border-b border-white/10 shrink-0">
           <span className="text-[9px] font-black uppercase tracking-[0.4em] text-red-600">Article Briefing</span>
-          <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full transition-all">
+          <button onClick={onClose} aria-label="Close modal" className="p-2 hover:bg-white/5 rounded-full transition-all">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>

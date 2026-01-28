@@ -6,16 +6,16 @@ const Hero: React.FC<{ onNavClick: (page: string) => void }> = ({ onNavClick }) 
 
   return (
     <section id="home" className="min-h-screen flex flex-col items-center justify-center text-center relative px-4 pt-20">
-      <h1 className="text-2xl md:text-4xl font-black text-white mb-4 drop-shadow-lg animate-fade-in-up uppercase tracking-tight">
+      <h1 className="text-4xl md:text-6xl font-black text-white mb-6 drop-shadow-2xl animate-fade-in-up uppercase tracking-tighter leading-tight max-w-5xl mx-auto">
         CUT THROUGH THE NOISE
         <br />
         STAY INFORMED
       </h1>
-      <p className="text-base md:text-lg text-gray-200 mb-12 max-w-2xl mx-auto drop-shadow-md animate-fade-in-up font-light" style={{ animationDelay: '0.2s' }}>
+      <p className="text-lg md:text-2xl text-gray-200 mb-12 max-w-3xl mx-auto drop-shadow-lg animate-fade-in-up font-light delay-200">
         Critical, clear-eyed commentary on the issues shaping our world.
       </p>
 
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up delay-[400ms]">
         <button
           onClick={() => onNavClick('articles')}
           className="inline-block bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-10 rounded-md transition-all duration-300 shadow-lg hover:shadow-red-500/40 hover:-translate-y-1 uppercase tracking-wider w-full sm:w-auto"

@@ -60,8 +60,8 @@ const About: React.FC = () => {
 
               <div className="lg:col-span-3 bg-black relative aspect-video lg:aspect-auto min-h-[400px]">
                 <iframe
-                  className="absolute inset-0 w-full h-full grayscale-[20%] group-hover:grayscale-0 transition-all duration-700"
-                  src={`https://www.youtube.com/embed/${videoId}?listType=playlist&list=${playlistId}&autoplay=0&mute=0&loop=1&controls=1&showinfo=0&rel=0&modestbranding=1`}
+                  className="absolute inset-0 w-full h-full grayscale-[20%] group-hover:grayscale-0 transition-all duration-700 pointer-events-none"
+                  src={`https://www.youtube.com/embed/videoseries?list=${playlistId}&autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&modestbranding=1&enablejsapi=1`}
                   title="YouTube video player for Novus Exchange"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

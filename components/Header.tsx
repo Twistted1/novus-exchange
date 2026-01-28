@@ -85,12 +85,29 @@ const Header: React.FC<HeaderProps> = ({ activePage, onNavClick, searchQuery = '
     if (onNavClick) onNavClick(page);
   };
 
+  // Fix for "Can't type in search bar": Use local state if onSearchChange is not provided
+  const [localSearch, setLocalSearch] = useState(searchQuery || '');
+
+  useEffect(() => {
+    if (searchQuery !== undefined && searchQuery !== localSearch) {
+      setLocalSearch(searchQuery);
+    }
+  }, [searchQuery]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setLocalSearch(val);
+    if (onSearchChange) {
+      onSearchChange(val);
+    }
+  };
+
   return (
     <header
       ref={headerRef}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled || isMenuOpen ? 'bg-black/80 backdrop-blur-lg' : 'bg-transparent'}`}
     >
-      <div className="px-4 sm:px-6 md:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
         <div className="flex items-center justify-between h-20">
           <div className="flex-shrink-0">
             <a
@@ -122,27 +139,32 @@ const Header: React.FC<HeaderProps> = ({ activePage, onNavClick, searchQuery = '
             </a>
           </div>
 
-          <nav className="hidden md:flex items-center space-x-1 capitalize">
-            {navItems.map(page => (
-              <NavLink key={page} page={page} activePage={activePage} onNavClick={handleNavClick}>{page.replace('-', ' ')}</NavLink>
-            ))}
-            <div className="relative ml-4">
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-                className="bg-white/10 border-white/20 rounded-md py-1.5 pl-8 pr-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all duration-300"
-              />
-              <svg className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+          <nav className="hidden md:flex items-right space-x-8 capitalize">
+            <div className="flex items-center space-x-6">
+              {navItems.map(page => (
+                <NavLink key={page} page={page} activePage={activePage} onNavClick={handleNavClick}>{page.replace('-', ' ')}</NavLink>
+              ))}
+            </div>
+            <div className="flex items-center ml-6 border-l border-white/20 pl-6">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={localSearch}
+                  onChange={handleSearchChange}
+                  className="bg-white/10 border-white/20 rounded-md py-1.5 pl-8 pr-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all duration-300 w-48 focus:w-64"
+                />
+                <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
             </div>
           </nav>
 
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="Toggle menu"
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-white/10 focus:outline-none"
             >
               <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
@@ -155,7 +177,7 @@ const Header: React.FC<HeaderProps> = ({ activePage, onNavClick, searchQuery = '
             </button>
           </div>
         </div>
-      </div>
+      </div >
 
       {isMenuOpen && (
         <div className="md:hidden bg-black/95 backdrop-blur-xl border-t border-white/10">
@@ -166,7 +188,7 @@ const Header: React.FC<HeaderProps> = ({ activePage, onNavClick, searchQuery = '
           </div>
         </div>
       )}
-    </header>
+    </header >
   );
 };
 
