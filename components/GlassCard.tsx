@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useRef, useEffect } from 'react';
 
 // FIX: Extend props with React.HTMLAttributes to allow passing standard div props like onClick.

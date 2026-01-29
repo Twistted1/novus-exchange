@@ -1,3 +1,5 @@
+"use client";
+
 // FIX: Created file content for the ArticleCard component.
 import React from 'react';
 import { Article } from '../../types';
@@ -11,8 +13,8 @@ interface ArticleCardProps {
 
 const ArticleCard: React.FC<ArticleCardProps> = ({ article, onClick, style }) => {
   return (
-    <GlassCard 
-      onClick={onClick} 
+    <GlassCard
+      onClick={onClick}
       className="cursor-pointer group overflow-hidden h-full flex flex-col transition-all duration-300 hover:border-cyan-400/50 hover:shadow-cyan-500/10"
       style={style}
     >

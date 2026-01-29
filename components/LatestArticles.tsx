@@ -56,7 +56,7 @@ const fallbackArticles: Article[] = [
 ];
 
 function ArticleCard({ article, index, onClick }: { article: Article, index: number, onClick: () => void }) {
-  const fallbackImage = 'https://placehold.co/1920x1080/1a1a1a/ffffff?text=Novus+Exchange'
+  const fallbackImage = 'https://placehold.co/1920x1080/1a1a1a/ffffff?text=Nonpm run buildvus+Exchange'
   const [imgSrc, setImgSrc] = useState(article.image || fallbackImage)
 
   return (
@@ -64,46 +64,48 @@ function ArticleCard({ article, index, onClick }: { article: Article, index: num
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      animate={{
-        y: [0, -5, 0],
-        rotate: [0, 0.5, 0, -0.5, 0]
-      }}
-      transition={{
-        duration: 0.5,
-        delay: index * 0.1,
-        y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: index * 0.5 },
-        rotate: { duration: 8, repeat: Infinity, ease: "easeInOut", delay: index * 0.3 }
-      }}
-      className="group relative bg-[#0a0a0a] rounded-[1.5rem] overflow-hidden border border-white/5 cursor-pointer flex flex-col transition-all duration-500 hover:border-red-600/30 hover:glow-shadow-red shadow-xl"
+      className="group relative bg-[#0a0a0a] rounded-[1.5rem] overflow-hidden border border-white/5 cursor-pointer flex flex-col transition-colors duration-500 hover:border-red-600/30 hover:glow-shadow-red shadow-xl"
       onClick={onClick}
     >
-      <div className="relative h-48 w-full overflow-hidden">
-        <Image
-          fill
-          sizes="(min-width: 768px) 33vw, 100vw"
-          className="object-cover transition-transform duration-1000 group-hover:scale-110"
-          src={imgSrc}
-          alt={article.title}
-          unoptimized
-          onError={() => setImgSrc(fallbackImage)}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
-      </div>
-
-      <div className="p-6 flex flex-col flex-grow">
-        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-red-600 mb-2">{article.category}</span>
-        <h3 className="text-xl font-bold text-white mb-3 leading-tight tracking-tight group-hover:text-red-500 transition-colors">
-          {article.title}
-        </h3>
-        <p className="text-gray-400 text-xs leading-relaxed mb-6 line-clamp-3 font-light">
-          {article.summary}
-        </p>
-
-        <div className="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
-          <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">{article.author}</span>
-          <span className="text-[9px] font-mono text-gray-600 uppercase tracking-widest">{article.readTime}</span>
+      <motion.div
+        className="flex flex-col flex-grow h-full w-full"
+        animate={{
+          y: [0, -5, 0],
+          rotate: [0, 0.5, 0, -0.5, 0]
+        }}
+        transition={{
+          y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: index * 0.5 },
+          rotate: { duration: 8, repeat: Infinity, ease: "easeInOut", delay: index * 0.3 }
+        }}
+      >
+        <div className="relative h-48 w-full overflow-hidden shrink-0">
+          <Image
+            fill
+            sizes="(min-width: 768px) 33vw, 100vw"
+            className="object-cover transition-transform duration-1000 group-hover:scale-110"
+            src={imgSrc}
+            alt={article.title}
+            unoptimized
+            onError={() => setImgSrc(fallbackImage)}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
         </div>
-      </div>
+
+        <div className="p-6 flex flex-col flex-grow">
+          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-red-600 mb-2">{article.category}</span>
+          <h3 className="text-xl font-bold text-white mb-3 leading-tight tracking-tight group-hover:text-red-500 transition-colors">
+            {article.title}
+          </h3>
+          <p className="text-gray-400 text-xs leading-relaxed mb-6 line-clamp-3 font-light">
+            {article.summary}
+          </p>
+
+          <div className="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
+            <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">{article.author}</span>
+            <span className="text-[9px] font-mono text-gray-600 uppercase tracking-widest">{article.readTime}</span>
+          </div>
+        </div>
+      </motion.div>
     </motion.div>
   )
 }

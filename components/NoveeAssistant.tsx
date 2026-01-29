@@ -29,6 +29,7 @@ export default function NoveeAssistant() {
   const [error, setError] = useState<string | null>(null);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
 
+
   // Load voices
   useEffect(() => {
     const updateVoices = () => {
@@ -54,17 +55,19 @@ export default function NoveeAssistant() {
   // Video hover logic
   const handleMouseEnter = () => {
     setIsHovered(true);
-    if (videoRef.current) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.play().catch(e => console.log('Video play failed (needs interaction?):', e));
+    const video = videoRef.current;
+    if (video) {
+      video.currentTime = 0;
+      video.play().catch(e => console.log('Video play failed (needs interaction?):', e));
     }
   };
 
   const handleMouseLeave = () => {
     setIsHovered(false);
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
+    const video = videoRef.current;
+    if (video) {
+      video.pause();
+      video.currentTime = 0;
     }
   };
 
@@ -251,5 +254,6 @@ export default function NoveeAssistant() {
         )}
       </AnimatePresence>
     </div>
+
   );
 }

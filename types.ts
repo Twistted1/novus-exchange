@@ -17,15 +17,15 @@ export interface Author {
 }
 
 export interface Article {
-  id: number;
+  id: string | number;
   title: string;
   excerpt: string;
   content: string;
   imageUrl: string;
-  category: 'Economic Insights' | 'Political Commentary' | 'Social Responsibility';
+  category: string; // Relaxed from enum for CMS flexibility
   author: Author;
   date: string;
-  readTime: number; // in minutes
+  readTime: string | number; // in minutes or string description
   tags: string[];
 }
 
