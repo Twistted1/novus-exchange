@@ -1,31 +1,28 @@
 "use client";
-// Force reload after component rename
 
-
-import { useState } from 'react'
-import useReveal from '../hooks/useReveal'
-import Hero from '../components/Hero'
-import About from '../components/About'
-import Solutions from '../components/Solutions'
-import LatestArticles from '../components/LatestArticles'
-import GlobalTrending from '../components/GlobalTrending'
-import Contact from '../components/Contact'
+import Hero from '../components/Hero';
+import About from '../components/About';
+import LatestArticles from '../components/LatestArticles';
+import GlobalTrending from '../components/GlobalTrending';
+import Solutions from '../components/Solutions';
+import Contact from '../components/Contact';
 
 export default function Home() {
-  useReveal()
-  const [searchQuery, setSearchQuery] = useState('')
+  const handleNavClick = (page: string) => {
+    const element = document.getElementById(page);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
-    <main className="min-h-screen text-white">
-      <Hero onNavClick={function (page: string): void {
-        throw new Error('Function not implemented.');
-      }} />
+    <main className="min-h-screen text-white bg-black">
+      <Hero onNavClick={handleNavClick} />
       <About />
-      <LatestArticles searchQuery={searchQuery} />
+      <LatestArticles searchQuery="" />
       <GlobalTrending />
-
       <Solutions />
       <Contact />
     </main>
-  )
+  );
 }

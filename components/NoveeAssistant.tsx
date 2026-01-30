@@ -89,7 +89,12 @@ export default function NoveeAssistant() {
       setInput(transcript);
     };
     recognition.onerror = (event: any) => {
-      console.error(event.error);
+      // Ignore "aborted" and "no-speech" errors - these are normal when user stops speaking
+      if (event.error === 'aborted' || event.error === 'no-speech') {
+        setIsListening(false);
+        return;
+      }
+      console.error('Speech recognition error:', event.error);
       setError('Voice input failed. Please try again.');
       setIsListening(false);
     };
@@ -110,8 +115,8 @@ export default function NoveeAssistant() {
         body: JSON.stringify({ prompt: userText, isSiteChat: true }) // isSiteChat triggers the system prompt in API
       });
       const data = await response.json();
-      setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'ai', text: data.text || 'I apologize, but I am having trouble connecting right now.' }]);
-      if (data.text) speakText(data.text);
+      setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'ai', text: data.response || 'I apologize, but I am having trouble connecting right now.' }]);
+      if (data.response) speakText(data.response);
     } catch {
       setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'ai', text: "I'm having trouble connecting right now." }]);
     }

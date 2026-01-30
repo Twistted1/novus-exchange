@@ -44,7 +44,7 @@ export default async function handler(req, res) {
     Make the user feel smarter and more connected after every interaction. You are the bridge between complex noise and clear signal.
   `
 
-    const hasGemini = !!process.env.GEMINI_API_KEY || !!process.env.GOOGLE_API_KEY
+    const hasGemini = !!process.env.GEMINI_API_KEY
 
     try {
         if (!model) {

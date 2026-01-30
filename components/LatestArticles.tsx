@@ -56,7 +56,7 @@ const fallbackArticles: Article[] = [
 ];
 
 function ArticleCard({ article, index, onClick }: { article: Article, index: number, onClick: () => void }) {
-  const fallbackImage = 'https://placehold.co/1920x1080/1a1a1a/ffffff?text=Nonpm run buildvus+Exchange'
+  const fallbackImage = 'https://placehold.co/1920x1080/1a1a1a/ffffff?text=Novus+Exchange'
   const [imgSrc, setImgSrc] = useState(article.image || fallbackImage)
 
   return (
@@ -64,11 +64,11 @@ function ArticleCard({ article, index, onClick }: { article: Article, index: num
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="group relative bg-[#0a0a0a] rounded-[1.5rem] overflow-hidden border border-white/5 cursor-pointer flex flex-col transition-colors duration-500 hover:border-red-600/30 hover:glow-shadow-red shadow-xl"
+      className="group relative bg-[#0a0a0a] rounded-[1.5rem] overflow-hidden border border-white/5 cursor-pointer flex flex-col transition-colors duration-500 hover:border-red-600/30 hover:glow-shadow-red shadow-xl max-h-[600px]"
       onClick={onClick}
     >
       <motion.div
-        className="flex flex-col flex-grow h-full w-full"
+        className="flex flex-col flex-grow"
         animate={{
           y: [0, -5, 0],
           rotate: [0, 0.5, 0, -0.5, 0]

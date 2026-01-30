@@ -128,12 +128,12 @@ export default function Solutions() {
                             }}
                             onMouseEnter={() => setHoveredIndex(index)}
                             onMouseLeave={() => setHoveredIndex(null)}
-                            className="relative group h-full"
+                            className="relative group"
                         >
-                            <GlassCard className={`h-full flex flex-col p-0 overflow-hidden border-white/5 bg-black/40 hover:bg-black/60 transition-all duration-500 rounded-3xl border-t-white/10 shadow-2xl group-hover:glow-shadow-${product.accent}`}>
+                            <GlassCard className={`flex flex-col p-0 overflow-hidden border-white/5 bg-black/40 hover:bg-black/60 transition-all duration-500 rounded-3xl border-t-white/10 shadow-2xl group-hover:glow-shadow-${product.accent} min-h-[400px] max-h-[500px]`}>
                                 <div className={`h-1 w-full bg-${product.accent}-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
 
-                                <div className="p-6 flex flex-col h-full">
+                                <div className="p-6 flex flex-col">
                                     <div className="flex justify-between items-start mb-6">
                                         <div className="relative">
                                             <div className={`w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-${product.accent}-500/50 transition-all`}>

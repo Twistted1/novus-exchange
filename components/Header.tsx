@@ -1,37 +1,34 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 
 interface NavLinkProps {
   page: string;
   activePage?: string;
-  onNavClick?: (page: string) => void;
   children: React.ReactNode;
   className?: string;
+  onNavClick?: (page: string) => void;
 }
 
-const NavLink: React.FC<NavLinkProps> = ({ page, activePage, onNavClick, children, className }) => {
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    const element = document.getElementById(page);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      window.location.href = `/#${page}`;
-    }
-    if (onNavClick) {
-      onNavClick(page);
-    }
-  };
-
+const NavLink: React.FC<NavLinkProps> = ({ page, activePage, children, className, onNavClick }) => {
   const isActive = activePage === page;
   const baseClasses = "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200";
   const activeClasses = "bg-white/10 text-white";
   const inactiveClasses = "text-gray-300 hover:text-white hover:bg-white/10";
 
+  const href = page === 'home' ? '/#home' : `/#${page}`;
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (onNavClick) {
+      onNavClick(page);
+    }
+  };
+
   return (
     <a
-      href={`/#${page}`}
+      href={href}
       onClick={handleClick}
       className={`${baseClasses} ${isActive ? activeClasses : inactiveClasses} ${className || ''}`}
     >
@@ -42,12 +39,11 @@ const NavLink: React.FC<NavLinkProps> = ({ page, activePage, onNavClick, childre
 
 interface HeaderProps {
   activePage?: string;
-  onNavClick?: (page: string) => void;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ activePage, onNavClick, searchQuery = '', onSearchChange }) => {
+const Header: React.FC<HeaderProps> = ({ activePage, searchQuery = '', onSearchChange }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
@@ -79,11 +75,15 @@ const Header: React.FC<HeaderProps> = ({ activePage, onNavClick, searchQuery = '
     };
   }, []);
 
-  const navItems = ['home', 'about', 'articles', 'trending', 'solutions', 'contact'];
-
   const handleNavClick = (page: string) => {
-    if (onNavClick) onNavClick(page);
+    const targetId = page === 'home' ? 'home' : page;
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
   };
+
+  const navItems = ['home', 'about', 'articles', 'trending', 'solutions', 'contact'];
 
   // Fix for "Can't type in search bar": Use local state if onSearchChange is not provided
   const [localSearch, setLocalSearch] = useState(searchQuery || '');
@@ -114,7 +114,6 @@ const Header: React.FC<HeaderProps> = ({ activePage, onNavClick, searchQuery = '
               href="/#home"
               onClick={(e) => {
                 e.preventDefault();
-                document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' });
                 handleNavClick('home');
               }}
               className="flex items-center space-x-3"
