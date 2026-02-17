@@ -4,5 +4,14 @@
             "path": "/api/trending",
             "schedule": "0 7 * * *"
         }
+    ],
+    "build": {
+        "outputDirectory": "next"
+    },
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/app/$1"
+        }
     ]
 }
